@@ -1,4 +1,5 @@
 
+
 import { putToDB, getAllFromDB, getFromDB, getSettingFromDB, putSettingToDB, clearAllStores, getFromDBByIndex } from './db.js';
 import { showToast, showConfirmationModal, showPage, loadDashboard, updateUiForRole } from './ui.js';
 import { queueSyncAction } from './sync.js';
@@ -1362,29 +1363,10 @@ export async function handleGoogleLogin() {
     const provider = new firebase.auth.GoogleAuthProvider();
     try {
         await firebase.auth().signInWithPopup(provider);
-        // Successful login will be handled by onAuthStateChanged listener in index.js
+        // The onAuthStateChanged listener in index.js will handle the rest (session claim, UI update)
     } catch (error) {
-        console.error("Google login error:", error);
-        let msg = "Gagal login dengan Google.";
-        
-        if (error.code === 'auth/popup-closed-by-user') {
-            msg = "Login dibatalkan oleh pengguna.";
-        } else if (error.code === 'auth/network-request-failed') {
-            msg = "Masalah koneksi internet.";
-        } else if (error.code === 'auth/operation-not-supported-in-this-environment') {
-            msg = "Login Google tidak didukung di lingkungan ini (perlu HTTP/HTTPS).";
-        } else if (error.code === 'auth/popup-blocked') {
-            msg = "Popup login diblokir. Mengalihkan ke mode redirect...";
-            try {
-                 await firebase.auth().signInWithRedirect(provider);
-                 return; // Redirecting, no need to show error
-            } catch (redirError) {
-                 console.error("Redirect login error:", redirError);
-                 msg = "Gagal login (Redirect).";
-            }
-        }
-        
-        showLoginView(msg, null, 'error');
+        console.error("Google Sign-In Error", error);
+        showLoginView("Gagal login dengan Google: " + error.message, null, 'error');
     }
 }
 
@@ -1585,3 +1567,4 @@ export function extendProAccess() {
         'bg-purple-600'
     );
 }
+

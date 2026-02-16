@@ -1,4 +1,5 @@
 
+
 // Main application entry point
 // FIX: Firebase imports are removed. The compat library loaded in index.html creates a global `firebase` object.
 
@@ -81,8 +82,8 @@ const functions = {
     getLocalDateString: ui.getLocalDateString,
     // product.js
     loadProductsList: product.loadProductsList,
-    loadMoreProductsList: product.loadMoreProductsList,
-    loadMoreProductsGrid: product.loadMoreProductsGrid,
+    loadMoreProductsList: product.loadMoreProductsList, // NEW
+    loadMoreProductsGrid: product.loadMoreProductsGrid, // NEW
     showAddProductModal: product.showAddProductModal,
     closeAddProductModal: product.closeAddProductModal,
     previewImage: product.previewImage,
@@ -107,9 +108,9 @@ const functions = {
     showStockHistoryModal: product.showStockHistoryModal,
     closeStockHistoryModal: product.closeStockHistoryModal,
     searchProducts: product.searchProducts,
-    toggleLowStockFilter: product.toggleLowStockFilter,
-    toggleExpiringFilter: product.toggleExpiringFilter,
-    toggleAdvancedRetailFields: product.toggleAdvancedRetailFields,
+    toggleLowStockFilter: product.toggleLowStockFilter, // NEW
+    toggleExpiringFilter: product.toggleExpiringFilter, // NEW
+    toggleAdvancedRetailFields: product.toggleAdvancedRetailFields, // NEW
     // cart.js
     addToCart: cart.addToCart,
     addVariationToCart: cart.addVariationToCart,
@@ -204,10 +205,10 @@ const functions = {
     showRegisterView: settings.showRegisterView,
     showForgotPasswordView: settings.showForgotPasswordView,
     handleEmailLogin: settings.handleEmailLogin,
-    handleGoogleLogin: settings.handleGoogleLogin,
     handleEmailRegister: settings.handleEmailRegister,
     handleForgotPassword: settings.handleForgotPassword,
     togglePasswordVisibility: settings.togglePasswordVisibility,
+    handleGoogleLogin: settings.handleGoogleLogin,
     // peripherals.js
     openCameraModal: peripherals.openCameraModal,
     closeCameraModal: peripherals.closeCameraModal,
