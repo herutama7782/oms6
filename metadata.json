@@ -1,0 +1,7 @@
+{
+  "description": "oms5",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "name": "POS Mobile + R9 Perbaikan R8 + Auth Google Sign"
+}

@@ -1,0 +1,944 @@
+
+
+
+<!-- Dasbor Page -->
+<div id="dashboard" class="page active">
+    <div class="p-4">
+        <div class="mb-4">
+            <div class="grid grid-cols-2 gap-4 items-start">
+                <div>
+                    <h1 id="dashboardStoreName" class="text-2xl font-bold text-gray-800 truncate">Dasbor</h1>
+                    <p id="dashboardStoreAddress" class="text-sm text-gray-500 truncate">Pengaturan toko belum diisi</p>
+                </div>
+                <div class="text-right">
+                    <p id="dashboardDate" class="text-sm font-semibold text-gray-700"></p>
+                    <div id="syncStatus" class="flex items-center justify-end gap-2 text-sm text-gray-500 cursor-pointer mt-1" onclick="syncWithServer(true)">
+                        <i id="syncIcon" class="fas fa-sync-alt"></i>
+                        <span id="syncText">Inisialisasi...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Onboarding Wizard -->
+        <div id="onboardingWizard" class="card p-4 mb-6 bg-indigo-50 border border-indigo-100 hidden">
+            <div class="flex justify-between items-center mb-2">
+                <h3 class="font-bold text-indigo-900">Panduan Awal</h3>
+                <span class="text-xs font-bold text-indigo-600" id="onboardingPercent">0%</span>
+            </div>
+            <!-- Progress Bar -->
+            <div class="w-full bg-indigo-200 rounded-full h-2.5 mb-4">
+                <div id="onboardingProgressBar" class="bg-indigo-600 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+            <!-- Steps -->
+            <ul class="space-y-3 text-sm">
+                <li id="step1" class="flex items-center p-2 rounded hover:bg-white transition-colors cursor-pointer" onclick="showPage('pengaturan')">
+                    <i class="far fa-circle mr-3 text-gray-400 text-lg"></i> 
+                    <span class="flex-1">Atur Identitas Toko (Nama & Alamat)</span>
+                    <i class="fas fa-chevron-right text-xs text-gray-400"></i>
+                </li>
+                <li id="step2" class="flex items-center p-2 rounded hover:bg-white transition-colors cursor-pointer" onclick="showPage('produk')">
+                     <i class="far fa-circle mr-3 text-gray-400 text-lg"></i>
+                     <span class="flex-1">Tambahkan Produk Pertama</span>
+                     <i class="fas fa-chevron-right text-xs text-gray-400"></i>
+                </li>
+                <li id="step3" class="flex items-center p-2 rounded hover:bg-white transition-colors cursor-pointer" onclick="showPage('kasir')">
+                     <i class="far fa-circle mr-3 text-gray-400 text-lg"></i>
+                     <span class="flex-1">Mulai Transaksi Pertama</span>
+                     <i class="fas fa-chevron-right text-xs text-gray-400"></i>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Onboarding Complete Banner -->
+        <div id="onboardingCompleteBanner" class="card p-4 mb-6 bg-green-50 border border-green-200 hidden relative">
+             <button onclick="document.getElementById('onboardingCompleteBanner').classList.add('hidden'); localStorage.setItem('onboardingBannerDismissed', 'true');" class="absolute top-2 right-2 text-green-700 hover:text-green-900 w-8 h-8 flex items-center justify-center rounded-full hover:bg-green-100 transition-colors">
+                <i class="fas fa-times"></i>
+             </button>
+             <div class="flex items-start pr-6">
+                <i class="fas fa-check-circle text-green-500 text-2xl mr-3 mt-1"></i>
+                <div>
+                    <h3 class="font-bold text-green-900 mb-1">Siap Berjualan!</h3>
+                    <p class="text-sm text-green-800 mb-3 leading-relaxed">
+                        Silahkan masuk ke halaman <strong>ADMIN</strong>, disana ada video tutorial lengkap cara menggunakan aplikasi ini.
+                    </p>
+                    <button onclick="showPage('pengaturan')" class="btn bg-green-600 text-white px-4 py-1.5 text-xs rounded-full shadow-sm hover:bg-green-700">
+                        Ke Halaman Admin <i class="fas fa-arrow-right ml-1"></i>
+                    </button>
+                </div>
+             </div>
+        </div>
+        
+        <!-- Cashier Button -->
+        <div class="cashier-btn clickable" onclick="showPage('kasir')">
+            <div class="cashier-btn-content">
+                <div class="cashier-btn-icon">
+                    <i class="fas fa-cash-register text-2xl"></i>
+                </div>
+                <div class="cashier-btn-text">
+                    <h3>Kasir</h3>
+                    <p>Buat transaksi baru</p>
+                </div>
+            </div>
+            <div class="cashier-btn-arrow">
+                <i class="fas fa-chevron-right"></i>
+            </div>
+        </div>
+
+        <!-- Expiring Products Notification (NEW) -->
+        <div id="expiringNotificationCard" class="card p-4 mb-4 bg-red-50 border-red-300 hidden clickable" onclick="showPage('produk', { filterExpiring: true })">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <i class="fas fa-calendar-times text-red-500 text-3xl mr-4"></i>
+                    <div>
+                        <h3 class="font-bold text-red-800">Batch Expired</h3>
+                        <p class="text-sm text-red-700"><span id="expiringCount">0</span> produk expired dalam 30 hari.</p>
+                    </div>
+                </div>
+                <i class="fas fa-chevron-right text-red-600"></i>
+            </div>
+        </div>
+
+        <!-- Due Date Notifications -->
+        <div id="dueDateNotificationCard" class="card p-4 mb-6 bg-yellow-50 border-yellow-300 hidden clickable">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <i class="fas fa-exclamation-circle text-yellow-500 text-3xl mr-4"></i>
+                    <div>
+                        <h3 class="font-bold text-yellow-800">Pengingat Jatuh Tempo</h3>
+                        <p class="text-sm text-yellow-700"><span id="dueDateCount">0</span> item akan/sudah jatuh tempo.</p>
+                    </div>
+                </div>
+                <i class="fas fa-chevron-right text-yellow-600"></i>
+            </div>
+        </div>
+        
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <div class="card p-4">
+                <div class="flex items-center justify-between mb-2">
+                    <i class="fas fa-shopping-cart text-blue-500 text-2xl"></i>
+                    <span class="text-xs text-gray-500">Hari Ini</span>
+                </div>
+                <h3 class="text-2xl font-bold" id="todaySales">Rp 0</h3>
+                <p class="text-sm text-gray-600">Penjualan</p>
+            </div>
+            
+            <div class="card p-4">
+                 <div class="flex items-center justify-between mb-2">
+                    <i class="fas fa-receipt text-purple-500 text-2xl"></i>
+                    <span class="text-xs text-gray-500">Hari Ini</span>
+                </div>
+                <h3 class="text-2xl font-bold" id="todayTransactions">0</h3>
+                <p class="text-sm text-gray-600">Transaksi</p>
+            </div>
+            
+            <div class="card p-4">
+                <div class="flex items-center justify-between mb-2">
+                    <i class="fas fa-box text-green-500 text-2xl"></i>
+                    <span class="text-xs text-gray-500">Total</span>
+                </div>
+                <h3 class="text-2xl font-bold" id="totalProducts">0</h3>
+                <p class="text-sm text-gray-600">Produk</p>
+            </div>
+            
+            <div class="card p-4 clickable" onclick="showPage('produk', { filterLowStock: true })">
+                <div class="flex items-center justify-between mb-2">
+                    <i class="fas fa-exclamation-triangle text-yellow-500 text-2xl"></i>
+                    <span class="text-xs text-gray-500">Segera Habis</span>
+                </div>
+                <h3 class="text-2xl font-bold" id="lowStockProducts">0</h3>
+                <p class="text-sm text-gray-600">Produk Stok Rendah</p>
+            </div>
+            
+            <div class="card p-4 col-span-2">
+                <div class="flex items-center justify-between mb-2">
+                    <i class="fas fa-chart-line text-orange-500 text-2xl"></i>
+                    <span class="text-xs text-gray-500">Bulan Ini</span>
+                </div>
+                <h3 class="text-2xl font-bold" id="monthSales">Rp 0</h3>
+                <p class="text-sm text-gray-600">Total Penjualan</p>
+            </div>
+        </div>
+
+        <!-- Sales Chart -->
+        <div id="salesChartCard" class="card p-4 mb-6" style="display: none;">
+            <div class="flex justify-between items-center mb-3">
+                <h2 class="text-lg font-semibold">Grafik Penjualan</h2>
+                <div id="chartViewToggle" class="relative bg-gray-200 p-1 rounded-full flex items-center w-40">
+                    <span id="chartViewGlider" class="absolute bg-white shadow rounded-full h-full w-1/2 transition-transform duration-300 ease-in-out"></span>
+                    <button id="dailyViewBtn" class="relative z-10 w-1/2 py-1.5 text-sm font-semibold text-gray-800 rounded-full focus:outline-none">Daily</button>
+                    <button id="weeklyViewBtn" class="relative z-10 w-1/2 py-1.5 text-sm font-semibold text-gray-800 rounded-full focus:outline-none">Weekly</button>
+                </div>
+            </div>
+            <div class="relative h-64">
+                <canvas id="salesChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Total Donation Card -->
+        <div class="card p-4 mb-6 bg-pink-50 border border-pink-200">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <i class="fas fa-hand-holding-heart text-pink-500 text-3xl mr-4"></i>
+                    <div>
+                        <h3 class="font-bold text-pink-800">Total Donasi Terkumpul</h3>
+                        <p class="text-sm text-pink-700">Sejak Reset Terakhir</p>
+                    </div>
+                </div>
+                <h3 class="text-2xl font-bold text-pink-600 text-right" id="totalAllTimeDonation">Rp 0</h3>
+            </div>
+        </div>
+        
+        <!-- Receivables and Debts Summary -->
+        <div class="grid grid-cols-2 gap-4">
+            <div id="receivablesSummaryCard" class="card p-4 clickable" onclick="showPage('kontak', { initialTab: 'customer' })">
+                <div class="flex items-center justify-between mb-2">
+                    <i class="fas fa-hand-holding-usd text-teal-500 text-2xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold" id="totalReceivables">Rp 0</h3>
+                <p class="text-sm text-gray-600">Total Piutang</p>
+            </div>
+            <div id="debtsSummaryCard" class="card p-4 clickable" onclick="showPage('kontak', { initialTab: 'supplier' })">
+                <div class="flex items-center justify-between mb-2">
+                    <i class="fas fa-file-invoice-dollar text-red-500 text-2xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold" id="totalDebts">Rp 0</h3>
+                <p class="text-sm text-gray-600">Total Hutang</p>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Kasir Page -->
+<div id="kasir" class="page">
+    <div class="p-4 pb-24">
+        <div class="flex justify-between items-center mb-4">
+            <h1 class="text-2xl font-bold">Kasir</h1>
+            <button id="cashierLogoutBtn" onclick="lockScreen()" class="hidden btn bg-yellow-500 text-white px-3 py-1.5 text-sm">
+                <i class="fas fa-lock"></i> Kunci
+            </button>
+        </div>
+        
+        <!-- Search Bar & Scan Button -->
+        <div class="flex gap-2 mb-4">
+            <input type="text" id="searchProduct" placeholder="Cari produk atau scan barcode..." class="input-field w-full">
+            <button onclick="showPendingTransactionsModal()" class="btn bg-yellow-500 text-white px-3 relative flex-shrink-0">
+                <i class="fas fa-pause-circle"></i>
+                <span id="pendingBadge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-semibold rounded-full h-5 w-5 flex items-center justify-center border-2 border-white hidden">0</span>
+            </button>
+            <button id="scanBarcodeBtn" onclick="handleKasirScan()" class="btn bg-gray-600 text-white px-4 flex-shrink-0">
+                <i class="fas fa-barcode"></i>
+            </button>
+        </div>
+        
+        <!-- Products Grid -->
+        <div class="grid grid-cols-3 gap-3 mb-4" id="productsGrid">
+            <!-- Products will be loaded here -->
+        </div>
+        
+        <!-- Load More Button -->
+        <div id="loadMoreGridContainer" class="text-center pb-4 hidden">
+            <button onclick="loadMoreProductsGrid()" class="btn bg-gray-200 text-gray-700 px-6 py-2 rounded-full text-sm font-semibold hover:bg-gray-300">
+                Muat Lebih Banyak
+            </button>
+        </div>
+    </div>
+    
+     <!-- Cart Modal -->
+    <div id="cartModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-40">
+        <div id="cartBackdrop" class="absolute inset-0" onclick="hideCartModal()"></div>
+        <div id="cartSection" class="fixed bottom-0 left-0 right-0 bg-white shadow-lg rounded-t-2xl p-4 max-h-[80vh] overflow-y-auto transform translate-y-full transition-transform duration-300 ease-in-out">
+            <div class="flex justify-between items-center mb-3 pb-3 border-b">
+                <h2 class="text-lg font-semibold">Keranjang</h2>
+                <div class="flex items-center gap-4">
+                    <button onclick="clearCart()" class="text-red-500 text-sm clickable">
+                        <i class="fas fa-trash"></i> Kosongkan
+                    </button>
+                    <button onclick="hideCartModal()" class="text-gray-500 text-2xl clickable">&times;</button>
+                </div>
+            </div>
+
+            <!-- Customer Search -->
+            <div class="mb-4">
+                <div id="selectedCustomerDisplay" class="hidden items-center justify-between p-2 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div>
+                        <p class="text-xs text-blue-700">Pelanggan:</p>
+                        <p id="selectedCustomerName" class="font-semibold text-blue-800"></p>
+                    </div>
+                    <button onclick="removeSelectedCustomer()" class="text-red-500 hover:text-red-700 clickable p-2"><i class="fas fa-times-circle"></i></button>
+                </div>
+                <div id="customerSearchContainer" class="flex gap-2">
+                    <div class="relative w-full">
+                        <input type="text" id="customerSearchInput" oninput="searchCustomers(this.value)" class="input-field w-full pl-8" placeholder="Cari pelanggan...">
+                        <i class="fas fa-user absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        <div id="customerSearchResults" class="absolute bg-white border rounded-lg shadow-lg mt-1 w-full max-h-48 overflow-y-auto z-50 hidden left-0 right-0">
+                            <!-- Search results will appear here -->
+                        </div>
+                    </div>
+                    <button onclick="scanBarcodeForInput('customerSearchInput')" class="btn bg-gray-600 text-white px-4 flex-shrink-0">
+                        <i class="fas fa-barcode"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div id="cartItems" class="space-y-2 mb-4">
+                <p class="text-gray-500 text-center py-4">Keranjang kosong</p>
+            </div>
+            
+            <div class="border-t pt-3">
+                <div class="space-y-1 mb-2">
+                    <div class="flex justify-between text-sm">
+                        <span>Subtotal:</span>
+                        <span id="cartSubtotal">Rp 0</span>
+                    </div>
+                    <div id="cartFees" class="space-y-1 text-sm border-t mt-2 pt-2">
+                        <!-- Applied fees will be shown here -->
+                    </div>
+                    <div class="flex justify-between border-t pt-1 mt-1">
+                        <span class="font-semibold">Total:</span>
+                        <span class="text-xl font-bold" id="cartTotal">Rp 0</span>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-2 mb-2">
+                    <button onclick="showFeeSelectionModal()" class="btn bg-gray-200 text-gray-700 w-full py-2 text-sm">
+                        <i class="fas fa-tags"></i> Pajak/Biaya
+                    </button>
+                     <button onclick="showPreviewReceiptModal()" class="btn bg-gray-200 text-gray-700 w-full py-2 text-sm">
+                        <i class="fas fa-eye"></i> Preview Struk
+                    </button>
+                </div>
+                <div class="grid grid-cols-2 gap-2 mt-2">
+                    <button onclick="holdTransaction()" class="btn bg-green-500 text-white w-full py-3 font-semibold">
+                        <i class="fas fa-pause"></i> Tahan
+                    </button>
+                    <button onclick="showPaymentModal()" class="btn bg-blue-500 text-white w-full py-3 font-semibold">
+                        <i class="fas fa-credit-card"></i> Bayar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart Floating Action Button -->
+    <div id="cartFab" onclick="showCartModal()" class="cart-fab clickable hidden">
+        <i class="fas fa-shopping-cart text-2xl"></i>
+        <span id="cartBadge" class="cart-badge hidden">0</span>
+    </div>
+</div>
+
+<!-- Produk Page -->
+<div id="produk" class="page">
+    <div class="p-4">
+        <div class="flex justify-between items-center mb-4">
+            <h1 class="text-2xl font-bold">Produk</h1>
+            <div class="flex gap-2">
+                 <button onclick="showManageCategoryModal()" class="btn bg-gray-600 text-white px-4 py-2">
+                    <i class="fas fa-tags"></i> Kategori
+                </button>
+                <button onclick="showAddProductModal()" class="btn bg-blue-500 text-white px-4 py-2">
+                    <i class="fas fa-plus"></i> Tambah
+                </button>
+            </div>
+        </div>
+
+        <!-- Search Bar & Scan Button (NEW) -->
+        <div class="flex gap-2 mb-4">
+            <input type="text" id="searchProductList" oninput="searchProducts(event)" class="input-field w-full" placeholder="Cari nama, kategori, atau barcode...">
+            <button onclick="scanBarcodeForInput('searchProductList')" class="btn bg-gray-600 text-white px-4 flex-shrink-0">
+                <i class="fas fa-barcode"></i>
+            </button>
+        </div>
+
+        <!-- Category, Low Stock, & Expiring Filter -->
+        <div class="flex gap-2 mb-4 overflow-x-auto pb-2 scrollbar-hide">
+            <select id="productCategoryFilter" onchange="loadProductsList()" class="input-field flex-grow min-w-[140px]">
+                <!-- Categories populated by JS -->
+            </select>
+            <button id="filterLowStockBtn" onclick="toggleLowStockFilter()" class="btn bg-gray-200 text-gray-700 px-3 flex items-center justify-center whitespace-nowrap transition-colors duration-200 flex-shrink-0">
+                <i class="fas fa-exclamation-triangle mr-1"></i> <span id="lowStockThresholdDisplay">5</span>
+            </button>
+            <button id="filterExpiringBtn" onclick="toggleExpiringFilter()" class="btn bg-gray-200 text-gray-700 px-3 flex items-center justify-center whitespace-nowrap transition-colors duration-200 flex-shrink-0">
+                <i class="fas fa-calendar-times mr-1"></i> Expired
+            </button>
+        </div>
+        
+        <!-- Products List -->
+        <div id="productsList" class="space-y-3">
+            <!-- Products will be loaded here -->
+        </div>
+        
+        <!-- Load More Button -->
+        <div id="loadMoreListContainer" class="text-center py-4 hidden">
+            <button onclick="loadMoreProductsList()" class="btn bg-gray-200 text-gray-700 px-6 py-2 rounded-full text-sm font-semibold hover:bg-gray-300">
+                Muat Lebih Banyak
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Kontak Page (New) -->
+<div id="kontak" class="page">
+    <div class="p-4">
+        <div class="flex justify-between items-center mb-4">
+            <h1 class="text-2xl font-bold">Kontak</h1>
+            <button onclick="showContactModal()" class="btn bg-blue-500 text-white px-4 py-2">
+                <i class="fas fa-plus"></i> Tambah
+            </button>
+        </div>
+
+        <!-- Search Bar (New) -->
+        <div class="flex gap-2 mb-4">
+            <input type="text" id="searchContactInput" oninput="searchContacts(this.value)" class="input-field w-full" placeholder="Cari nama, telp, barcode...">
+            <button onclick="scanBarcodeForInput('searchContactInput')" class="btn bg-gray-600 text-white px-4 flex-shrink-0">
+                <i class="fas fa-barcode"></i>
+            </button>
+        </div>
+
+        <!-- Tabs for Pelanggan/Supplier -->
+        <div class="flex border-b mb-4">
+            <button id="customerTab" class="tab-item active" onclick="switchContactTab('customer')">Pelanggan</button>
+            <button id="supplierTab" class="tab-item" onclick="switchContactTab('supplier')">Supplier</button>
+        </div>
+        
+        <div id="customerListContainer">
+            <div id="customerList" class="space-y-3">
+                <!-- Customer list rendered here -->
+            </div>
+        </div>
+        
+        <div id="supplierListContainer" class="hidden">
+            <div id="supplierList" class="space-y-3">
+                <!-- Supplier list rendered here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Laporan Page -->
+<div id="laporan" class="page pb-24">
+    <div class="p-4">
+        <h1 class="text-2xl font-bold mb-4">Laporan</h1>
+        
+        <!-- View for Admin/Manager -->
+        <div id="adminReportView">
+             <!-- Reset Donation Counter Card (New) -->
+            <div class="card p-4 mb-4 bg-pink-50 border border-pink-200">
+                <div class="flex justify-between items-center">
+                     <div>
+                        <h2 class="font-bold text-pink-800">Donasi Dasbor</h2>
+                        <p class="text-sm text-pink-700">Atur ulang perhitungan donasi yang tampil di dasbor.</p>
+                     </div>
+                     <button onclick="resetDonationCounter()" class="btn bg-pink-500 text-white px-4 py-2 text-sm">
+                        <i class="fas fa-redo-alt mr-2"></i>Reset
+                     </button>
+                </div>
+            </div>
+
+            <!-- Cashier Daily Report (Owner/Manager View) -->
+            <div class="card p-4 mb-4 text-center border border-blue-200 bg-blue-50">
+                <h2 class="text-lg font-semibold mb-3">Laporan Kasir Harian</h2>
+                <p class="text-sm text-gray-600 mb-4">Buat ringkasan penjualan Anda untuk hari ini.</p>
+                <button onclick="generateCashierReport(this)" class="btn bg-blue-500 text-white w-full py-3 shadow-md">
+                    <i class="fas fa-file-invoice-dollar mr-2"></i> Buat Laporan Tutup Kasir
+                </button>
+            </div>
+
+            <!-- Expense Management Button -->
+            <button onclick="showExpenseModal()" class="btn bg-orange-500 text-white w-full py-3 mb-4 font-semibold shadow-md">
+                <i class="fas fa-wallet mr-2"></i> Catat Pengeluaran Operasional
+            </button>
+
+            <!-- Date Range -->
+            <div class="card p-4 mb-4">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-sm text-gray-600">Dari</label>
+                        <input type="date" id="dateFrom" class="input-field w-full">
+                    </div>
+                    <div>
+                        <label class="text-sm text-gray-600">Sampai</label>
+                        <input type="date" id="dateTo" class="input-field w-full">
+                    </div>
+                </div>
+                <button onclick="generateReport()" class="btn bg-blue-500 text-white w-full mt-3 py-2">
+                    <i class="fas fa-chart-bar"></i> Generate Laporan
+                </button>
+            </div>
+            
+            <!-- Report Summary -->
+            <div id="reportSummary" class="card p-4 mb-4" style="display: none;">
+                <h2 class="text-lg font-semibold mb-3">Ringkasan Laporan</h2>
+                <div class="space-y-2 text-sm">
+                    <!-- Omzet -->
+                    <div class="flex justify-between items-center border-b pb-2">
+                        <span class="font-semibold text-gray-800">Total Omzet (Penjualan Bersih):</span>
+                        <span class="font-bold text-lg text-blue-600" id="reportOmzet">Rp 0</span>
+                    </div>
+                    <!-- Total Donasi -->
+                    <div class="flex justify-between items-center border-b pb-2 pt-2">
+                        <span class="font-semibold text-gray-800">Total Donasi Terkumpul:</span>
+                        <span class="font-bold text-lg text-green-600" id="reportTotalDonation">Rp 0</span>
+                    </div>
+                     <!-- Wholesale & Discount -->
+                    <div class="flex justify-between items-center pt-1">
+                        <span class="text-gray-600">(Termasuk Penjualan Grosir):</span>
+                        <span class="font-semibold text-gray-600" id="reportWholesaleSales">Rp 0</span>
+                    </div>
+                    <div class="flex justify-between items-center pt-1">
+                        <span class="text-gray-600">Total Diskon Diberikan:</span>
+                        <span class="font-semibold text-orange-500" id="reportTotalDiscount">Rp 0</span>
+                    </div>
+                    <!-- HPP -->
+                    <div class="flex justify-between items-center pt-1">
+                        <span class="text-gray-600">(-) Harga Pokok Penjualan (HPP):</span>
+                        <span class="font-semibold text-red-500" id="reportHpp">Rp 0</span>
+                    </div>
+                    <!-- Laba Kotor -->
+                    <div class="flex justify-between items-center border-b pb-2">
+                        <span class="font-semibold text-gray-800">Laba Kotor Penjualan:</span>
+                        <span class="font-bold text-green-600" id="reportGrossProfit">Rp 0</span>
+                    </div>
+                    <!-- Fees -->
+                    <div class="flex justify-between items-center pt-1">
+                        <span class="text-gray-600">(-) Biaya Transaksi & Layanan:</span>
+                        <span class="font-semibold text-red-500" id="reportOperationalCost">Rp 0</span>
+                    </div>
+                    <!-- New Expense Row -->
+                    <div class="flex justify-between items-center pt-1 border-b pb-2">
+                        <span class="text-gray-600">(-) Pengeluaran Toko (Listrik/Gaji):</span>
+                        <span class="font-semibold text-red-500" id="reportManualExpenses">Rp 0</span>
+                    </div>
+                    <!-- Laba Bersih -->
+                    <div class="flex justify-between items-center border-b pb-2 pt-2">
+                        <span class="font-semibold text-gray-800">Laba Bersih Usaha:</span>
+                        <span class="font-bold text-xl text-green-700" id="reportNetProfit">Rp 0</span>
+                    </div>
+                    
+                    <!-- Debt/Receivable Payments (NEW) -->
+                    <div class="flex justify-between items-center pt-2">
+                        <span class="text-gray-600">(+) Pelunasan Piutang Diterima:</span>
+                        <span class="font-semibold text-teal-600" id="reportReceivablePayments">Rp 0</span>
+                    </div>
+                    <div class="flex justify-between items-center pt-1 border-b pb-2">
+                        <span class="text-gray-600">(-) Pembayaran Hutang Supplier:</span>
+                        <span class="font-semibold text-red-500" id="reportDebtPayments">Rp 0</span>
+                    </div>
+
+                    <!-- Arus Kas (Renamed) -->
+                    <div class="flex justify-between items-center pt-2">
+                        <span class="font-semibold text-gray-800">Estimasi Kas Masuk Bersih:</span>
+                        <span class="font-bold text-xl text-blue-700" id="reportCashFlow">Rp 0</span>
+                    </div>
+                    <div class="border-t pt-2 mt-2"></div>
+                    <!-- Info Tambahan -->
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">Total Transaksi:</span>
+                        <span class="font-semibold" id="reportTotalTransactions">0</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">Rata-rata Omzet / Transaksi:</span>
+                        <span class="font-semibold" id="reportAverage">Rp 0</span>
+                    </div>
+                </div>
+                <button onclick="exportReportToCSV()" class="btn bg-green-500 text-white w-full mt-4 py-2">
+                    <i class="fas fa-file-excel"></i> Export ke Excel (.csv)
+                </button>
+            </div>
+
+            <!-- Produk Terlaris -->
+            <div id="topSellingProductsCard" class="card p-4 mb-4" style="display: none;">
+                <h2 class="text-lg font-semibold mb-3">Produk Terlaris</h2>
+                <div id="topSellingProductsList" class="space-y-2">
+                    <!-- Top products will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Report Details -->
+            <div id="reportDetails" class="card p-4" style="display: none;">
+                <h2 class="text-lg font-semibold mb-3">Detail Transaksi</h2>
+                <div id="reportTransactions" class="space-y-2">
+                    <!-- Report transactions will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- View for Cashier -->
+        <div id="cashierReportView" class="hidden">
+            <div class="card p-4 mb-4 text-center">
+                <h2 class="text-lg font-semibold mb-3">Laporan Kasir Harian</h2>
+                <p class="text-sm text-gray-600 mb-4">Buat ringkasan penjualan Anda untuk hari ini.</p>
+                <button onclick="generateCashierReport(this)" class="btn bg-blue-500 text-white w-full py-3">
+                    <i class="fas fa-file-invoice-dollar mr-2"></i> Buat Laporan Tutup Kasir
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Pengaturan Page -->
+<div id="pengaturan" class="page">
+    <div class="p-4">
+        <h1 class="text-2xl font-bold mb-4">Pengaturan</h1>
+        
+        <!-- Store Settings -->
+        <div class="card p-4 mb-4">
+            <h2 class="text-lg font-semibold mb-3">Informasi & Struk</h2>
+            <div class="space-y-3">
+                <div>
+                    <label class="text-sm text-gray-600">Logo Toko (Opsional)</label>
+                    <div class="image-upload-container clickable" onclick="document.getElementById('storeLogoInput').click()">
+                        <input type="file" id="storeLogoInput" accept="image/*" style="display: none;" onchange="previewStoreLogo(event)">
+                        <div id="storeLogoPreview" class="upload-placeholder">
+                            <i class="fas fa-image text-3xl mb-2"></i>
+                            <p>Tap untuk upload logo</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-between items-center mt-3">
+                    <label for="showLogoOnReceipt" class="text-sm text-gray-600 cursor-pointer">Tampilkan Logo di Struk</label>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                      <input type="checkbox" id="showLogoOnReceipt" class="sr-only peer">
+                      <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                    </label>
+                </div>
+                <div>
+                    <label class="text-sm text-gray-600">Nama Toko</label>
+                    <input type="text" id="storeName" class="input-field w-full" placeholder="Nama Toko Anda">
+                </div>
+                <div>
+                    <label class="text-sm text-gray-600">Alamat</label>
+                    <textarea id="storeAddress" class="input-field w-full" rows="2" placeholder="Alamat Toko"></textarea>
+                </div>
+                <div>
+                    <label class="text-sm text-gray-600">Teks Footer Struk (Opsional)</label>
+                    <textarea id="storeFooterText" class="input-field w-full" rows="2" placeholder="Contoh: Terima Kasih!"></textarea>
+                </div>
+                <div>
+                    <label class="text-sm text-gray-600">Telepon Kritik & Saran (Opsional)</label>
+                    <input type="tel" id="storeFeedbackPhone" class="input-field w-full" placeholder="e.g., 1500959">
+                </div>
+                <div>
+                    <label class="text-sm text-gray-600">Batas Min. Reward (Opsional)</label>
+                    <input type="number" id="couponMinPurchase" class="input-field w-full" placeholder="e.g., 50000">
+                </div>
+                <div>
+                    <label class="text-sm text-gray-600">Teks Reward  (Opsional)</label>
+                    <textarea id="couponText" class="input-field w-full" rows="2" placeholder="Selamat Anda Mendapatkan Reward 1 liter Minyak Goreng"></textarea>
+                </div>
+
+                <div class="border-t my-4"></div>
+                <h3 class="text-md font-semibold mb-2">Perangkat Keras</h3>
+                
+                <div class="p-3 bg-blue-50 border border-blue-200 rounded-lg text-center mb-3">
+                    <p class="text-xs text-blue-700 mb-2">
+                        Fitur printer memerlukan aplikasi 
+                        <a href="https://play.google.com/store/apps/details?id=ru.a402d.rawbtprinter" target="_blank" class="text-blue-600 underline font-bold">RawBT</a> 
+                        ter-install dari Play Store.
+                    </p>
+                     <div class="grid grid-cols-2 gap-2">
+                        <button id="testPrintBtn" onclick="testPrint()" class="btn bg-gray-600 text-white w-full py-2 text-sm">
+                            <i class="fas fa-print"></i> Test Cetak
+                        </button>
+                        <button onclick="showPrintHelpModal()" class="btn bg-blue-500 text-white w-full py-2 text-sm">
+                            <i class="fas fa-question-circle"></i> Bantuan
+                        </button>
+                    </div>
+                </div>
+
+                <div id="autoPrintContainer" class="flex justify-between items-center mb-4">
+                    <label for="autoPrintReceipt" class="text-sm text-gray-600 cursor-pointer">Cetak Struk Otomatis</label>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                      <input type="checkbox" id="autoPrintReceipt" class="sr-only peer">
+                      <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                    </label>
+                </div>
+
+               <div class="mt-2 mb-4">
+                    <label class="text-sm text-gray-600">Ukuran Kertas Printer</label>
+                    <select id="printerPaperSize" class="input-field w-full">
+                        <option value="58mm">58mm (Kecil)</option>
+                        <option value="80mm">80mm (Standar)</option>  
+                    </select>
+                </div>
+
+                <div class="flex justify-between items-center mt-3 mb-4">
+                    <div class="pr-4">
+                        <label for="autoOpenCashDrawer" class="text-sm text-gray-600 cursor-pointer">Buka Laci Kas Otomatis</label>
+                        <p class="text-xs text-gray-500">Buka laci kas setelah cetak berhasil.</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                      <input type="checkbox" id="autoOpenCashDrawer" class="sr-only peer">
+                      <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                    </label>
+                </div>
+
+                <div class="flex justify-between items-center mt-3 mb-4">
+                    <div class="pr-4">
+                        <label for="useExternalScanner" class="text-sm text-gray-600 cursor-pointer font-semibold">Gunakan Scanner Eksternal (USB)</label>
+                        <p class="text-xs text-gray-500">Nonaktifkan kamera, gunakan input keyboard/scanner fisik.</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                      <input type="checkbox" id="useExternalScanner" class="sr-only peer">
+                      <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                    </label>
+                </div>
+                
+                <div class="flex justify-between items-center mt-3">
+                    <div class="pr-4">
+                        <label for="enableDonationRounding" class="text-sm text-gray-600 cursor-pointer">Aktifkan Donasi Pembulatan</label>
+                        <p class="text-xs text-gray-500">Membulatkan total belanja ke atas untuk donasi.</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                      <input type="checkbox" id="enableDonationRounding" class="sr-only peer">
+                      <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                    </label>
+                </div>
+                
+                <div class="border-t my-4"></div>
+
+                <div class="flex justify-between items-center">
+                    <div class="pr-4">
+                        <label for="pointSystemEnabled" class="text-sm text-gray-600 font-semibold cursor-pointer">Program Poin Reward</label>
+                        <p class="text-xs text-gray-500">Aktifkan sistem poin untuk pelanggan.</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="pointSystemEnabled" class="sr-only peer" onchange="document.getElementById('pointSystemSettings').style.display = this.checked ? 'block' : 'none'">
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                    </label>
+                </div>
+                <div id="pointSystemSettings" class="hidden space-y-3 pt-3 mt-3 border-t">
+                    <div>
+                        <label class="text-sm text-gray-600">Minimum Pembelian untuk Poin (Rp)</label>
+                        <input type="number" id="pointMinPurchase" class="input-field w-full" placeholder="Contoh: 50000">
+                    </div>
+                    <div>
+                        <label class="text-sm text-gray-600">Nilai per 1 Poin (Rp)</label>
+                        <input type="number" id="pointValuePerPoint" class="input-field w-full" placeholder="Contoh: 1000 (1 poin per Rp 1000)">
+                    </div>
+                </div>
+
+                <div class="border-t my-4"></div>
+                
+                <div>
+                    <label class="text-sm text-gray-600">Ambang Batas Stok Rendah</label>
+                    <input type="number" id="lowStockThreshold" class="input-field w-full" placeholder="Contoh: 5">
+                </div>
+                <button onclick="saveStoreSettings()" class="btn bg-blue-500 text-white w-full py-2">
+                    <i class="fas fa-save"></i> Simpan
+                </button>
+            </div>
+        </div>
+
+        <!-- Tax and Fees Management -->
+        <div class="card p-4 mb-4">
+            <h2 class="text-lg font-semibold mb-3">Kelola Pajak & Biaya</h2>
+            <div class="space-y-3 p-3 bg-gray-50 rounded-lg mb-4 border">
+                <h3 class="font-semibold text-md">Tambah Biaya Baru</h3>
+                <div>
+                    <label class="text-sm text-gray-600">Nama Biaya</label>
+                    <input type="text" id="feeName" placeholder="Contoh: PPN, Service Charge" class="input-field w-full">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-sm text-gray-600">Tipe</label>
+                        <select id="feeType" class="input-field w-full">
+                            <option value="percentage">Persen (%)</option>
+                            <option value="fixed">Fixed (Rp)</option>
+                        </select>
+                    </div>
+                     <div>
+                        <label class="text-sm text-gray-600">Nilai</label>
+                        <input type="number" id="feeValue" placeholder="e.g., 11 or 5000" class="input-field w-full">
+                    </div>
+                </div>
+                 <div class="flex justify-between items-center mt-2">
+                    <label for="feeIsDefault" class="text-sm text-gray-600 cursor-pointer">Terapkan Otomatis</label>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                      <input type="checkbox" id="feeIsDefault" class="sr-only peer">
+                      <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                    </label>
+                </div>
+                <button onclick="addFee()" class="btn bg-blue-500 text-white w-full py-2 mt-2">
+                    <i class="fas fa-plus"></i> Tambah
+                </button>
+            </div>
+            <div id="feesList" class="space-y-2">
+                <!-- Fees will be listed here -->
+            </div>
+        </div>
+
+        <!-- User Management (NEW) -->
+        <div id="userManagementCard" class="card p-4 mb-4" style="display: none;">
+            <h2 class="text-lg font-semibold mb-3">Manajemen Pengguna</h2>
+            <button onclick="showManageUsersModal()" class="btn bg-gray-600 text-white w-full py-2">
+                <i class="fas fa-users-cog"></i> Kelola Pengguna
+            </button>
+        </div>
+        
+        <!-- Data Management -->
+        <div id="dataManagementCard" class="card p-4 mb-4" style="display: none;">
+            <h2 class="text-lg font-semibold mb-3">Manajemen Data</h2>
+            <div class="space-y-2">
+                <button onclick="showImportProductsModal()" class="btn bg-cyan-500 text-white w-full py-2">
+                    <i class="fas fa-file-csv"></i> Import Produk (.CSV)
+                </button>
+                <button onclick="exportData()" class="btn bg-green-500 text-white w-full py-2">
+                    <i class="fas fa-download"></i> Export Backup Data (.JSON)
+                </button>
+                <button onclick="importData()" class="btn bg-purple-500 text-white w-full py-2">
+                    <i class="fas fa-upload"></i> Import Backup Data (.JSON)
+                </button>
+                <input type="file" id="importFile" style="display: none;" accept=".json" onchange="handleImport(event)">
+                <button id="clearDataBtn" onclick="clearAllData()" class="btn bg-red-500 text-white w-full py-2" style="display: none;">
+                    <i class="fas fa-trash"></i> Hapus Semua Data
+                </button>
+
+                <!-- Backup Reminder Section -->
+                <div class="mt-3 pt-3 border-t">
+                    <div class="flex justify-between items-center mb-4">
+                        <div class="pr-4">
+                            <label for="autoBackupOnClose" class="text-sm text-gray-600 cursor-pointer font-semibold">Auto Backup saat Tutup Kasir</label>
+                            <p class="text-xs text-gray-500">Otomatis download backup data setiap kali laporan kasir dibuat.</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                          <input type="checkbox" id="autoBackupOnClose" class="sr-only peer">
+                          <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        </label>
+                    </div>
+
+                    <div class="flex justify-between items-center">
+                        <div class="pr-4">
+                            <label for="exportBackupReminder" class="text-sm text-gray-600 cursor-pointer">Ingatkan Export Backup</label>
+                            <p class="text-xs text-gray-500">Dapatkan pengingat untuk backup data secara berkala.</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                          <input type="checkbox" id="exportBackupReminder" class="sr-only peer" onchange="document.getElementById('exportIntervalContainer').style.display = this.checked ? 'block' : 'none'">
+                          <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        </label>
+                    </div>
+                    <div id="exportIntervalContainer" class="mt-2 space-y-2" style="display: none;">
+                        <div>
+                            <label for="exportBackupInterval" class="text-sm text-gray-600">Interval Pengingat (hari)</label>
+                            <input type="number" id="exportBackupInterval" class="input-field w-full mt-1" placeholder="Contoh: 7" min="1" value="7">
+                        </div>
+                    </div>
+                     <button onclick="saveStoreSettings()" class="btn bg-blue-500 text-white w-full py-2 mt-3">
+                        <i class="fas fa-save"></i> Simpan
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Barcode/Label Generator -->
+        <div class="card p-4 mb-4">
+            <h2 class="text-lg font-semibold mb-3">Cetak Label Harga & Barcode</h2>
+            <div class="space-y-3">
+                <div>
+                    <label class="text-sm text-gray-600">Nama Produk (Opsional)</label>
+                    <input type="text" id="product-name" class="input-field w-full" placeholder="Contoh: Terigu Curah 1Kg">
+                </div>
+                <div>
+                    <label class="text-sm text-gray-600">Harga Produk (Opsional)</label>
+                    <input type="number" id="product-price" class="input-field w-full" placeholder="Contoh: 18000">
+                </div>
+                <div>
+                    <label class="text-sm text-gray-600">Teks/Angka untuk Barcode</label>
+                    <input type="text" id="barcode-code" class="input-field w-full" placeholder="TC-1Kg">
+                </div>
+                <button id="generateBarcodeLabelBtn" class="btn bg-blue-500 text-white w-full py-2">
+                    <i class="fas fa-tags mr-2"></i>Buat Label
+                </button>
+               
+                <div id="barcodeLabelOutput" class="hidden text-center p-4 border rounded-lg bg-gray-100">
+                    <div id="labelContent" class="p-2 bg-white inline-block shadow-md">
+                        <!-- Explicit styling for better PNG/Print consistency -->
+                        <div class="flex flex-col items-center justify-center" style="width: 210px;"> <!-- Approx 55mm paper width for preview -->
+                            <p id="output-product-name" class="font-bold text-sm break-words w-full text-center mb-0"></p>
+                            <p id="output-product-price" class="font-semibold text-sm break-words w-full text-center mb-2"></p>
+                            <div class="my-0">
+                               <svg id="barcode"></svg>
+                            </div>
+                            <p id="output-barcode-text" class="font-mono text-xs break-words w-full text-center mt-0"></p>
+                        </div>
+                    </div>
+                </div>
+        
+                <div id="download-buttons" class="hidden grid grid-cols-2 gap-2 mt-2">
+                    <button id="downloadPngBtn" class="btn bg-green-500 text-white w-full py-2">
+                        <i class="fas fa-download mr-2"></i>Unduh PNG
+                    </button>
+                    <button id="printLabelBtn" class="btn bg-gray-600 text-white w-full py-2">
+                        <i class="fas fa-print mr-2"></i>Cetak Label
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Countdown Feature (NEW) -->
+        <div class="card p-4 mb-4">
+            <h2 class="text-lg font-semibold mb-3">Akses Akun</h2>
+            <div id="timerDisplay" class="hidden text-center">
+                <p class="text-lg font-semibold">Waktu tersisa:</p>
+                <div class="grid grid-cols-4 gap-2 my-2 text-center">
+                    <div>
+                        <span id="timer-days" class="text-3xl font-bold text-blue-600">0</span>
+                        <span class="text-xs block text-gray-500">Hari</span>
+                    </div>
+                    <div>
+                        <span id="timer-hours" class="text-3xl font-bold text-blue-600">0</span>
+                        <span class="text-xs block text-gray-500">Jam</span>
+                    </div>
+                    <div>
+                        <span id="timer-minutes" class="text-3xl font-bold text-blue-600">0</span>
+                        <span class="text-xs block text-gray-500">Menit</span>
+                    </div>
+                    <div>
+                        <span id="timer-seconds" class="text-3xl font-bold text-blue-600">0</span>
+                        <span class="text-xs block text-gray-500">Detik</span>
+                    </div>
+                </div>
+            </div>
+            <div id="featureLinkContainer" class="hidden text-center">
+                <p class="text-sm text-gray-600 mb-2">Buka akses tanpa batas ke semua fitur. Satu kali pembelian, manfaat selamanya.</p>
+                <a href="https://registrasi-jual-putus.pages.dev" target="_blank" class="btn bg-green-500 text-white inline-block py-2 px-12">
+                    Registrasi
+                </a>
+                <p class="text-sm text-gray-600 mb-2">Bagi yang belum melakukan registrasi, sistem akan menutup aplikasi secara otomatis demi keamanan.</p>
+            </div>
+            
+            <!-- Added PRO Access Button -->
+            <div class="mt-4 pt-2 border-t flex justify-center">
+                <button onclick="extendProAccess()" class="btn bg-gradient-to-r from-purple-500 to-indigo-600 text-white px-6 py-2 rounded-full shadow-md transform transition hover:scale-105 text-sm font-bold flex items-center">
+                    <i class="fas fa-crown mr-2 text-yellow-300"></i> PRO Akses
+                </button>
+            </div>
+        </div>
+                   
+        <!-- About -->
+        <div class="card p-4 mb-4">
+            <h2 class="text-lg font-semibold mb-3">Tentang</h2>
+            <p class="text-sm text-gray-600 mb-2">OmsetPOS - Sahabat Setia Kasir UMKM v1.0</p>
+            <p class="text-sm text-gray-600">Panduan Lengkapnya Di Sini: <a href="https://tutorialomsetin.pages.dev/" target="_blank" class="text-blue-600 font-bold hover:underline">Video Tutorial-Online</a></p>
+            <p class="text-sm text-gray-600 mb-2">============================</p>
+            <p class="text-sm text-red-600">Spec Minimal untuk menjalankan Aplikasi ini : Android 10 - Ram.3GB/Rom.64GB - Camera Auto Focus Min.5MP</p>
+            <p class="text-sm text-gray-600 mb-2">============================</p>
+            <p class="text-sm text-gray-600 mb-2">Note: Tidak disarankan Multitasking membuka banyak aplikasi lainnya secara bersamaan.</p>
+        </div>
+        
+        <!-- Session Management -->
+        <div id="sessionManagementCard" class="card p-4 mb-4">
+            <h2 class="text-lg font-semibold mb-3">Sesi & Keamanan</h2>
+            <div class="space-y-2">
+                <button onclick="lockScreen()" class="btn bg-yellow-500 text-white w-full py-2">
+                    <i class="fas fa-lock"></i> Kunci Layar / Ganti Pengguna
+                </button>
+                <button id="fullLogoutBtn" onclick="logout()" class="btn bg-orange-500 text-white w-full py-2">
+                    <i class="fas fa-sign-out-alt"></i> Logout Akun Utama
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

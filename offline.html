@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Koneksi Terputus</title>
+    <style>
+        body { text-align: center; padding-top: 50px; font-family: sans-serif; background-color: #f8f9fa; color: #343a40; margin: 0; }
+        .container { max-width: 320px; margin: 0 auto; padding: 20px; }
+        h1 { color: #343a40; font-size: 24px; }
+        p { color: #6c757d; }
+        img { margin-bottom: 20px; }
+        button {
+            padding: 12px 25px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+        button:hover { background-color: #0056b3; }
+        #status-msg { margin-top: 15px; color: #dc3545; font-size: 14px; display: none; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <img src="icon-192.png" width="192" alt="Ikon" />
+    <h1>Login Awal Akun</h1>
+    <p>Koneksi dibutuhkan untuk masuk ke akun Anda.</p>
+
+    <button id="btn-retry" onclick="retryConnection()">Coba Lagi</button>
+    <p id="status-msg">Maaf, koneksi internet belum tersedia.</p>
+</div>
+
+<script>
+    async function retryConnection() {
+        const button = document.getElementById('btn-retry');
+        const msg = document.getElementById('status-msg');
+
+        // 1. Tampilan saat loading
+        button.textContent = 'Mengecek...';
+        button.disabled = true;
+        msg.style.display = 'none';
+
+        // 2. Cek koneksi secara teknis (Ping ke server google/tujuan)
+        // Ini mencegah munculnya error "Halaman tidak tersedia" dari sistem
+        try {
+            // Mencoba mengambil resource kecil (mode no-cors agar tidak error CORS)
+            // Kita coba fetch link tujuan dengan timeout singkat
+            const response = await fetch("https://www.google.com/generate_204", {
+                mode: 'no-cors',
+                cache: 'no-store'
+            });
+
+            // Jika berhasil sampai sini, berarti internet ada
+            window.location.href = "https://oms5.pages.dev";
+
+        } catch (error) {
+            // Jika gagal (tidak ada internet), tetap di halaman ini
+            button.textContent = 'Coba Lagi';
+            button.disabled = false;
+            msg.style.display = 'block'; // Tampilkan pesan bahwa internet masih mati
+
+            // Opsional: Berikan alert sederhana agar user tahu kenapa tidak pindah halaman
+            console.log("Koneksi gagal");
+        }
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,1039 @@
+
+
+
+
+
+
+<!-- Add Product Modal -->
+<div id="addProductModal" class="fixed inset-0 bg-black bg-opacity-50 hidden">
+    <div class="flex items-center justify-center h-full p-4">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <h2 class="text-xl font-bold mb-4">Tambah Produk</h2>
+            <div class="space-y-3">
+                <!-- Image Upload -->
+                <div>
+                    <label class="text-sm text-gray-600">Gambar Produk</label>
+                    <div class="image-upload-container clickable" onclick="document.getElementById('productImage').click()">
+                        <input type="file" id="productImage" accept="image/*" style="display: none;" onchange="previewImage(event)">
+                        <div id="imagePreview" class="upload-placeholder">
+                            <i class="fas fa-camera text-3xl mb-2"></i>
+                            <p>Tap untuk upload gambar</p>
+                        </div>
+                    </div>
+                    <button type="button" onclick="openCameraModal()" class="btn bg-gray-600 text-white w-full py-2 mt-2">
+                        <i class="fas fa-camera-retro mr-2"></i>Ambil Foto
+                    </button>
+                </div>
+                
+                <div>
+                    <label class="text-sm text-gray-600">Nama Produk Lengkap </label>
+                    <input type="text" id="productName" class="input-field w-full" placeholder="Nama Produk + Satuan (Opsional)">
+                </div>
+                
+                <div>
+                    <label class="text-sm text-gray-600">Barcode (Opsional)</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="productBarcode" class="input-field w-full" placeholder="Scan atau ketik barcode">
+                        <button onclick="scanBarcodeForInput('productBarcode')" class="btn bg-gray-600 text-white px-4 flex-shrink-0">
+                            <i class="fas fa-barcode"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-sm text-gray-600">Harga Beli</label>
+                        <input type="number" id="productPurchasePrice" class="input-field w-full" placeholder="0">
+                    </div>
+                    <div>
+                        <label class="text-sm text-gray-600">Harga Jual</label>
+                        <input type="number" id="productPrice" class="input-field w-full" placeholder="0">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 items-end">
+                    <div>
+                        <label class="text-sm text-gray-600">Stok</label>
+                        <input type="number" id="productStock" class="input-field w-full" placeholder="0">
+                    </div>
+                    <div class="flex items-center pb-2">
+                        <input type="checkbox" id="unlimitedStock" onchange="toggleUnlimitedStock('addProductModal')" class="h-4 w-4 rounded text-blue-600 border-gray-300 focus:ring-blue-500">
+                        <label for="unlimitedStock" class="ml-2 text-sm text-gray-600">Stok tak terbatas</label>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="text-sm text-gray-600">Kategori</label>
+                    <select id="productCategory" class="input-field w-full">
+                       <!-- Categories populated by JS -->
+                    </select>
+                </div>
+
+                <!-- Toggle Manajemen Retail Lengkap -->
+                <div class="flex justify-between items-center my-3 bg-blue-50 p-3 rounded-lg border border-blue-100">
+                    <label for="addAdvancedToggle" class="text-sm font-bold text-blue-800 cursor-pointer">Manajemen Retail Lengkap</label>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                      <input type="checkbox" id="addAdvancedToggle" class="sr-only peer" onchange="toggleAdvancedRetailFields('add')">
+                      <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                    </label>
+                </div>
+
+                <!-- Advanced Fields Container -->
+                <div id="addAdvancedFields" class="hidden space-y-3">
+                    <div>
+                        <label class="text-sm text-gray-600">Variasi Produk (Opsional)</label>
+                        <div id="variationsContainer" class="space-y-2 mt-1 p-2 border rounded-md bg-gray-50">
+                            <!-- Variation rows will be added here by JS -->
+                        </div>
+                        <button type="button" onclick="addVariationRow('addProductModal')" class="btn bg-gray-200 text-gray-700 w-full py-2 mt-2 text-sm">
+                            <i class="fas fa-plus mr-2"></i>Tambah Variasi
+                        </button>
+                    </div>
+
+                    <div id="mainWholesalePriceSection">
+                        <label class="text-sm text-gray-600">Harga Grosir (Opsional)</label>
+                        <div id="wholesalePricesContainer" class="space-y-2 mt-1">
+                            <!-- Wholesale price rows will be added here by JS -->
+                        </div>
+                        <button type="button" onclick="addWholesalePriceRow('addProductModal')" class="btn bg-gray-200 text-gray-700 w-full py-2 mt-2 text-sm">
+                            <i class="fas fa-plus mr-2"></i>Tambah Harga Grosir
+                        </button>
+                    </div>
+
+                    <div>
+                        <label class="text-sm text-gray-600">Diskon (Rp) (Opsional)</label>
+                        <input type="number" id="productDiscountValue" class="input-field w-full" placeholder="0" min="0">
+                    </div>
+
+                    <!-- Batch & Additional Info -->
+                    <div class="border-t pt-3 mt-3 bg-gray-50 p-3 rounded-lg">
+                        <h3 class="font-semibold text-gray-700 mb-2 text-sm">Informasi Batch & Tambahan (Opsional)</h3>
+                        <div class="grid grid-cols-2 gap-3 mb-2">
+                            <div>
+                                <label class="text-xs text-gray-600">Nomor Batch</label>
+                                <input type="text" id="productBatchNumber" class="input-field w-full text-sm">
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-600">Tanggal Expired</label>
+                                <input type="date" id="productExpiryDate" class="input-field w-full text-sm">
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <label class="text-xs text-gray-600">Informasi Supplier</label>
+                            <input type="text" id="productSupplierInfo" class="input-field w-full text-sm" placeholder="Nama Supplier">
+                        </div>
+                        <div>
+                            <label class="text-xs text-gray-600">Catatan</label>
+                            <textarea id="productNotes" class="input-field w-full text-sm" rows="2"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="flex gap-3 mt-6">
+                <button onclick="closeAddProductModal()" class="btn bg-gray-300 text-gray-700 flex-1 py-2">
+                    Batal
+                </button>
+                <button onclick="addProduct()" class="btn bg-blue-500 text-white flex-1 py-2">
+                    Simpan
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Product Modal -->
+<div id="editProductModal" class="fixed inset-0 bg-black bg-opacity-50 hidden">
+    <div class="flex items-center justify-center h-full p-4">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <h2 class="text-xl font-bold mb-4">Edit Produk</h2>
+            <input type="hidden" id="editProductId">
+            <div class="space-y-3">
+                <!-- Image Upload -->
+                <div>
+                    <label class="text-sm text-gray-600">Gambar Produk</label>
+                    <div class="image-upload-container clickable" onclick="document.getElementById('editProductImage').click()">
+                        <input type="file" id="editProductImage" accept="image/*" style="display: none;" onchange="previewEditImage(event)">
+                        <div id="editImagePreview" class="upload-placeholder">
+                            <i class="fas fa-camera text-3xl mb-2"></i>
+                            <p>Tap untuk ubah gambar</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="text-sm text-gray-600">Nama Produk Lengkap</label>
+                    <input type="text" id="editProductName" class="input-field w-full" placeholder="Nama Produk + Satuan (Opsional)">
+                </div>
+                
+                <div>
+                    <label class="text-sm text-gray-600">Barcode (Opsional)</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="editProductBarcode" class="input-field w-full" placeholder="Scan atau ketik barcode">
+                         <button onclick="scanBarcodeForInput('editProductBarcode')" class="btn bg-gray-600 text-white px-4 flex-shrink-0">
+                            <i class="fas fa-barcode"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-sm text-gray-600">Harga Beli</label>
+                        <input type="number" id="editProductPurchasePrice" class="input-field w-full" placeholder="0">
+                    </div>
+                    <div>
+                        <label class="text-sm text-gray-600">Harga Jual</label>
+                        <input type="number" id="editProductPrice" class="input-field w-full" placeholder="0">
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-3 items-end">
+                    <div>
+                        <label class="text-sm text-gray-600">Stok</label>
+                        <input type="number" id="editProductStock" class="input-field w-full" placeholder="0">
+                    </div>
+                    <div class="flex items-center pb-2">
+                        <input type="checkbox" id="editUnlimitedStock" onchange="toggleUnlimitedStock('editProductModal')" class="h-4 w-4 rounded text-blue-600 border-gray-300 focus:ring-blue-500">
+                        <label for="editUnlimitedStock" class="ml-2 text-sm text-gray-600">Stok tak terbatas</label>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-sm text-gray-600">Kategori</label>
+                    <select id="editProductCategory" class="input-field w-full">
+                        <!-- Categories populated by JS -->
+                    </select>
+                </div>
+
+                <!-- Toggle Manajemen Retail Lengkap -->
+                <div class="flex justify-between items-center my-3 bg-blue-50 p-3 rounded-lg border border-blue-100">
+                    <label for="editAdvancedToggle" class="text-sm font-bold text-blue-800 cursor-pointer">Manajemen Retail Lengkap</label>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                      <input type="checkbox" id="editAdvancedToggle" class="sr-only peer" onchange="toggleAdvancedRetailFields('edit')">
+                      <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                    </label>
+                </div>
+
+                <!-- Advanced Fields Container -->
+                <div id="editAdvancedFields" class="hidden space-y-3">
+                    <div>
+                        <label class="text-sm text-gray-600">Variasi Produk (Opsional)</label>
+                        <div id="editVariationsContainer" class="space-y-2 mt-1 p-2 border rounded-md bg-gray-50">
+                            <!-- Variation rows will be added here by JS -->
+                        </div>
+                        <button type="button" onclick="addVariationRow('editProductModal')" class="btn bg-gray-200 text-gray-700 w-full py-2 mt-2 text-sm">
+                            <i class="fas fa-plus mr-2"></i>Tambah Variasi
+                        </button>
+                    </div>
+
+                    <div id="editMainWholesalePriceSection">
+                        <label class="text-sm text-gray-600">Harga Grosir (Opsional)</label>
+                        <div id="editWholesalePricesContainer" class="space-y-2 mt-1">
+                            <!-- Wholesale price rows will be added here by JS -->
+                        </div>
+                        <button type="button" onclick="addWholesalePriceRow('editProductModal')" class="btn bg-gray-200 text-gray-700 w-full py-2 mt-2 text-sm">
+                            <i class="fas fa-plus mr-2"></i>Tambah Harga Grosir
+                        </button>
+                    </div>
+                    
+                    <div>
+                        <label class="text-sm text-gray-600">Diskon (Rp) (Opsional)</label>
+                        <input type="number" id="editProductDiscountValue" class="input-field w-full" placeholder="0" min="0">
+                    </div>
+                    
+                    <!-- Batch & Additional Info -->
+                    <div class="border-t pt-3 mt-3 bg-gray-50 p-3 rounded-lg">
+                        <h3 class="font-semibold text-gray-700 mb-2 text-sm">Informasi Batch & Tambahan (Opsional)</h3>
+                        <div class="grid grid-cols-2 gap-3 mb-2">
+                            <div>
+                                <label class="text-xs text-gray-600">Nomor Batch</label>
+                                <input type="text" id="editProductBatchNumber" class="input-field w-full text-sm">
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-600">Tanggal Expired</label>
+                                <input type="date" id="editProductExpiryDate" class="input-field w-full text-sm">
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <label class="text-xs text-gray-600">Informasi Supplier</label>
+                            <input type="text" id="editProductSupplierInfo" class="input-field w-full text-sm" placeholder="Nama Supplier">
+                        </div>
+                        <div>
+                            <label class="text-xs text-gray-600">Catatan</label>
+                            <textarea id="editProductNotes" class="input-field w-full text-sm" rows="2"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="flex gap-3 mt-6">
+                <button onclick="closeEditProductModal()" class="btn bg-gray-300 text-gray-700 flex-1 py-2">
+                    Batal
+                </button>
+                <button onclick="updateProduct()" class="btn bg-blue-500 text-white flex-1 py-2">
+                    Simpan
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stock History Modal (New) -->
+<div id="stockHistoryModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-[1600]">
+    <div class="flex items-center justify-center h-full p-4">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold" id="stockHistoryTitle">Riwayat Stok</h2>
+                <button onclick="closeStockHistoryModal()" class="text-gray-500 text-2xl">&times;</button>
+            </div>
+            <div id="stockHistoryList" class="space-y-2">
+                <!-- History logs populated here -->
+            </div>
+            <div class="mt-6">
+                <button onclick="closeStockHistoryModal()" class="btn bg-gray-300 text-gray-700 w-full py-2">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Manage Category Modal -->
+<div id="manageCategoryModal" class="fixed inset-0 bg-black bg-opacity-50 hidden">
+    <div class="flex items-center justify-center h-full p-4">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-sm">
+            <h2 class="text-xl font-bold mb-4">Kelola Kategori</h2>
+            <div class="mb-4">
+                <div class="flex gap-2">
+                    <input type="text" id="newCategoryName" class="input-field w-full" placeholder="Nama kategori baru">
+                    <button onclick="addNewCategory()" class="btn bg-blue-500 text-white px-4 flex-shrink-0">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+            </div>
+            <div id="categoryList" class="space-y-2 max-h-60 overflow-y-auto">
+                <!-- Category list will be populated here -->
+            </div>
+            <div class="flex mt-6">
+                <button onclick="closeManageCategoryModal()" class="btn bg-gray-300 text-gray-700 flex-1 py-2">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Fee Selection Modal -->
+<div id="feeSelectionModal" class="fixed inset-0 bg-black bg-opacity-50 hidden">
+    <div class="flex items-center justify-center h-full p-4">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-sm">
+            <h2 class="text-xl font-bold mb-4">Pajak & Biaya Tambahan</h2>
+            <div id="feeSelectionList" class="space-y-3 max-h-60 overflow-y-auto">
+                <!-- Fee selection options will be populated here -->
+            </div>
+            <div class="flex gap-3 mt-6">
+                <button onclick="closeFeeSelectionModal()" class="btn bg-gray-300 text-gray-700 flex-1 py-2">
+                    Batal
+                </button>
+                <button onclick="applySelectedFees()" class="btn bg-blue-500 text-white flex-1 py-2">
+                    Terapkan
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add/Edit Contact Modal (New) -->
+<div id="contactModal" class="fixed inset-0 bg-black bg-opacity-50 hidden">
+    <div class="flex items-center justify-center h-full p-4">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <h2 id="contactModalTitle" class="text-xl font-bold mb-4">Tambah Kontak</h2>
+            <input type="hidden" id="contactId">
+            <div class="space-y-3">
+                <div>
+                    <label class="text-sm text-gray-600">Nama Kontak</label>
+                    <input type="text" id="contactName" class="input-field w-full" placeholder="Nama pelanggan/supplier">
+                </div>
+                <div>
+                    <label class="text-sm text-gray-600">No. HP/WA</label>
+                    <input type="tel" id="contactPhone" class="input-field w-full" placeholder="08123456789">
+                </div>
+                <div>
+                    <label class="text-sm text-gray-600">Barcode (Opsional)</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="contactBarcode" class="input-field w-full" placeholder="Scan atau ketik barcode">
+                        <button onclick="scanBarcodeForInput('contactBarcode')" class="btn bg-gray-600 text-white px-4 flex-shrink-0">
+                            <i class="fas fa-barcode"></i>
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    <label class="text-sm text-gray-600">Alamat (Opsional)</label>
+                    <textarea id="contactAddress" class="input-field w-full" rows="2" placeholder="Alamat lengkap"></textarea>
+                </div>
+                 <div>
+                    <label class="text-sm text-gray-600">Catatan (Opsional)</label>
+                    <textarea id="contactNotes" class="input-field w-full" rows="2" placeholder="Catatan penting"></textarea>
+                </div>
+                <div>
+                    <label class="text-sm text-gray-600">Tipe Kontak</label>
+                    <select id="contactType" class="input-field w-full">
+                        <option value="customer">Pelanggan</option>
+                        <option value="supplier">Supplier</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex gap-3 mt-6">
+                <button onclick="closeContactModal()" class="btn bg-gray-300 text-gray-700 flex-1 py-2">Batal</button>
+                <button onclick="saveContact()" class="btn bg-blue-500 text-white flex-1 py-2">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ledger Detail Modal (New) -->
+<div id="ledgerModal" class="fixed inset-0 bg-black bg-opacity-50 hidden">
+    <div class="flex items-center justify-center h-full p-4">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <h2 id="ledgerContactName" class="text-xl font-bold"></h2>
+                    <p id="ledgerContactType" class="text-sm font-semibold"></p>
+                </div>
+                <button onclick="closeLedgerModal()" class="text-gray-500 text-2xl">&times;</button>
+            </div>
+            <div id="ledgerContactDetails" class="text-sm text-gray-600 mb-4 p-3 bg-gray-50 rounded-lg"></div>
+            <h3 class="text-lg font-semibold mb-2">Riwayat Transaksi</h3>
+            <div id="ledgerHistory" class="space-y-2 border-t pt-2 max-h-60 overflow-y-auto">
+                <!-- Ledger history rendered here -->
+            </div>
+            <div class="grid grid-cols-2 gap-3 mt-6">
+                <button onclick="showAddLedgerEntryModal(null, 'credit')" class="btn bg-green-500 text-white w-full py-2">
+                    <i class="fas fa-plus-circle"></i> Catat Pembayaran
+                </button>
+                <button onclick="showAddLedgerEntryModal(null, 'debit')" id="addDebitButton" class="btn bg-red-500 text-white w-full py-2">
+                    <i class="fas fa-minus-circle"></i> Tambah Utang/Piutang
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Ledger Entry Modal (New) -->
+<div id="addLedgerEntryModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-[1600]">
+    <div class="flex items-center justify-center h-full p-4">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-sm">
+            <h2 id="addLedgerEntryTitle" class="text-xl font-bold mb-4"></h2>
+            <div class="space-y-3">
+                <div>
+                    <label class="text-sm text-gray-600">Jumlah (Rp)</label>
+                    <input type="number" id="ledgerAmount" class="input-field w-full" placeholder="0">
+                </div>
+                <div>
+                    <label class="text-sm text-gray-600">Keterangan</label>
+                    <input type="text" id="ledgerDescription" class="input-field w-full" placeholder="e.g., Pembelian barang, Cicilan">
+                </div>
+                <div id="ledgerDueDateContainer">
+                    <label class="text-sm text-gray-600">Jatuh Tempo (Opsional)</label>
+                    <input type="date" id="ledgerDueDate" class="input-field w-full">
+                </div>
+            </div>
+             <div class="flex gap-3 mt-6">
+                <button onclick="closeAddLedgerEntryModal()" class="btn bg-gray-300 text-gray-700 flex-1 py-2">Batal</button>
+                <button onclick="saveLedgerEntry()" class="btn bg-blue-500 text-white flex-1 py-2">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Due Date Modal (New) -->
+<div id="editDueDateModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-[1700]">
+    <div class="flex items-center justify-center h-full p-4">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-sm">
+            <h2 class="text-xl font-bold mb-4">Ubah Tanggal Jatuh Tempo</h2>
+            <input type="hidden" id="editDueDateEntryId">
+            <div>
+                <label class="text-sm text-gray-600">Tanggal Jatuh Tempo Baru</label>
+                <input type="date" id="newDueDate" class="input-field w-full">
+            </div>
+             <div class="flex gap-3 mt-6">
+                <button onclick="closeEditDueDateModal()" class="btn bg-gray-300 text-gray-700 flex-1 py-2">Batal</button>
+                <button onclick="saveDueDate()" class="btn bg-blue-500 text-white flex-1 py-2">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Expense List Modal (New) -->
+<div id="expenseListModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-[1500]">
+    <div class="flex items-center justify-center h-full p-4">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold">Pengeluaran Operasional</h2>
+                <button onclick="showExpenseFormModal()" class="btn bg-blue-500 text-white px-3 py-1 text-sm"><i class="fas fa-plus"></i> Tambah</button>
+            </div>
+            <div id="expenseList" class="space-y-2">
+                <!-- Expense list populated here -->
+            </div>
+            <div class="flex mt-6">
+                <button onclick="closeExpenseModal()" class="btn bg-gray-300 text-gray-700 flex-1 py-2">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Expense Form Modal (New) -->
+<div id="expenseFormModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-[1600]">
+    <div class="flex items-center justify-center h-full p-4">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-sm">
+            <h2 id="expenseFormTitle" class="text-xl font-bold mb-4">Catat Pengeluaran</h2>
+            <input type="hidden" id="expenseId">
+            <div class="space-y-3">
+                <div>
+                    <label class="text-sm text-gray-600">Tanggal</label>
+                    <input type="date" id="expenseDate" class="input-field w-full">
+                </div>
+                <div>
+                    <label class="text-sm text-gray-600">Nama Pengeluaran</label>
+                    <input type="text" id="expenseName" class="input-field w-full" placeholder="e.g. Listrik, Gaji, Plastik">
+                </div>
+                <div>
+                    <label class="text-sm text-gray-600">Jumlah (Rp)</label>
+                    <input type="number" id="expenseAmount" class="input-field w-full" placeholder="0">
+                </div>
+                <div>
+                    <label class="text-sm text-gray-600">Kategori</label>
+                    <select id="expenseCategory" class="input-field w-full">
+                        <option value="Operasional">Operasional (Listrik, Air, dll)</option>
+                        <option value="Gaji">Gaji Karyawan</option>
+                        <option value="Perlengkapan">Perlengkapan Toko</option>
+                        <option value="Sewa">Sewa Tempat</option>
+                        <option value="Lainnya">Lainnya</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-sm text-gray-600">Keterangan (Opsional)</label>
+                    <textarea id="expenseDescription" class="input-field w-full" rows="2"></textarea>
+                </div>
+            </div>
+             <div class="flex gap-3 mt-6">
+                <button onclick="closeExpenseFormModal()" class="btn bg-gray-300 text-gray-700 flex-1 py-2">Batal</button>
+                <button onclick="saveExpense()" class="btn bg-blue-500 text-white flex-1 py-2">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Confirmation Modal -->
+<div id="confirmationModal" class="fixed inset-0 bg-black bg-opacity-50 hidden">
+    <div class="flex items-center justify-center h-full p-4">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-sm">
+            <h2 class="text-xl font-bold mb-4" id="confirmationTitle">Konfirmasi</h2>
+            <div id="confirmationMessage" class="text-gray-600 mb-6"></div>
+            <div class="flex gap-3">
+                <button id="cancelButton" onclick="closeConfirmationModal()" class="btn bg-gray-300 text-gray-700 flex-1 py-2">
+                    Batal
+                </button>
+                <button id="confirmButton" class="btn text-white flex-1 py-2"></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Payment Modal -->
+<div id="paymentModal" class="fixed inset-0 bg-black bg-opacity-50 hidden">
+    <div class="flex items-center justify-center h-full p-4">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-sm">
+            <h2 class="text-xl font-bold mb-4">Pembayaran</h2>
+            <div class="space-y-4">
+                <div id="paymentSummary" class="space-y-1 border-b pb-3 mb-3">
+                    <div class="flex justify-between items-center text-gray-600 hidden">
+                        <span>Total Belanja:</span>
+                        <span id="paymentTotalOriginal" class="font-semibold text-base">Rp 0</span>
+                    </div>
+                    <div id="donationLine" class="flex justify-between items-center text-gray-600 hidden">
+                        <span>Donasi (pembulatan):</span>
+                        <div class="flex items-center">
+                            <label class="relative inline-flex items-center cursor-pointer mr-3">
+                              <input type="checkbox" id="donationToggle" class="sr-only peer" onchange="handleDonationToggle()">
+                              <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                            </label>
+                            <span id="paymentDonation" class="font-semibold text-base">Rp 0</span>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-lg">Total Bayar:</span>
+                        <span id="paymentTotal" class="font-bold text-blue-500 text-xl">Rp 0</span>
+                    </div>
+                </div>
+
+                <!-- Payment Method Selection -->
+                <div class="grid grid-cols-3 gap-2">
+                    <button id="paymentMethodCash" onclick="selectPaymentMethod('cash')" class="btn bg-blue-500 text-white py-2">
+                        <i class="fas fa-money-bill-wave"></i> Tunai
+                    </button>
+                    <button id="paymentMethodQris" onclick="selectPaymentMethod('qris')" class="btn bg-gray-200 text-gray-700 py-2">
+                        <i class="fas fa-qrcode"></i> QRIS
+                    </button>
+                    <button id="paymentMethodDebt" onclick="selectPaymentMethod('debt')" class="btn bg-gray-200 text-gray-700 py-2">
+                        <i class="fas fa-file-invoice"></i> Piutang
+                    </button>
+                </div>
+
+                <div id="cashPaymentFields">
+                    <div>
+                        <label class="text-sm text-gray-600">Uang Dibayarkan</label>
+                        <input type="number" id="cashPaidInput" class="input-field w-full text-2xl font-bold text-right text-blue-600 border-2 focus:ring-blue-500" placeholder="0">
+                    </div>
+                    <div class="grid grid-cols-4 gap-2">
+                        <button onclick="handleQuickCash(10000)" class="btn bg-gray-200 text-gray-700 py-2">10rb</button>
+                        <button onclick="handleQuickCash(20000)" class="btn bg-gray-200 text-gray-700 py-2">20rb</button>
+                        <button onclick="handleQuickCash(50000)" class="btn bg-gray-200 text-gray-700 py-2">50rb</button>
+                        <button onclick="handleQuickCash(100000)" class="btn bg-gray-200 text-gray-700 py-2">100rb</button>
+                    </div>
+                </div>
+                
+                <div class="flex justify-between items-center text-lg">
+                    <span id="paymentChangeLabel" class="text-gray-600">Kembalian:</span>
+                    <span id="paymentChange" class="font-bold text-green-500">Rp 0</span>
+                </div>
+            </div>
+            <p id="debtNote" class="text-xs text-blue-500 text-center italic hidden">Database / kontak pelanggan harus terdaftar</p>
+            <div class="flex gap-3 mt-6">
+                <button onclick="closePaymentModal()" class="btn bg-gray-300 text-gray-700 flex-1 py-3">
+                    Batal
+                </button>
+                <button id="completeTransactionButton" onclick="completeTransaction()" class="btn bg-blue-500 text-white flex-1 py-3 disabled:bg-blue-300 flex items-center justify-center" disabled>
+                    <span class="payment-button-text">Selesaikan Transaksi</span>
+                    <i class="fas fa-spinner fa-spin payment-button-spinner hidden"></i>
+                </button>
+            </div>        
+        </div>
+    </div>
+</div>
+
+<!-- Receipt Modal -->
+<div id="receiptModal" class="fixed inset-0 bg-black bg-opacity-50 hidden">
+    <div class="flex items-center justify-center h-full p-4">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-sm">
+            <div id="receiptContent" class="receipt-modal-content text-black font-mono text-sm mb-6 max-h-96 overflow-y-auto">
+                <!-- Receipt content will be dynamically generated here -->
+            </div>
+            <div class="grid grid-cols-2 gap-2 mb-2">
+                <button id="printReceiptBtn" onclick="printReceipt()" class="btn bg-gray-700 hover:bg-gray-800 text-white py-3 text-sm flex items-center justify-center"><i class="fas fa-print mr-2"></i>Cetak</button>
+                <button onclick="shareReceiptViaWhatsApp()" class="btn bg-green-500 hover:bg-green-600 text-white py-3 text-sm flex items-center justify-center"><i class="fas fa-share-alt mr-2"></i>Share</button>
+            </div>
+            <button id="receiptActionButton" class="btn bg-blue-500 hover:bg-blue-600 text-white w-full py-3 text-sm font-semibold"></button>
+        </div>
+    </div>
+</div>
+
+<!-- Receipt Preview Modal -->
+<div id="previewReceiptModal" class="fixed inset-0 bg-black bg-opacity-50 hidden">
+    <div class="flex items-center justify-center h-full p-4">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-sm">
+            <h2 class="text-xl font-bold mb-4">Preview Struk</h2>
+            <div id="previewReceiptContent" class="receipt-modal-content text-black font-mono text-sm mb-6 max-h-96 overflow-y-auto border p-2 rounded-lg bg-gray-50">
+                <!-- Preview content will be dynamically generated here -->
+            </div>
+            <div class="flex flex-col gap-3">
+                <button onclick="closePreviewReceiptModal()" class="btn bg-gray-300 text-gray-700 w-full py-3">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Barcode Scanner Modal -->
+<div id="scanModal" class="fixed inset-0 bg-black bg-opacity-90 hidden">
+    <div class="flex flex-col items-center justify-center h-full p-4">
+        <div id="qr-reader" class="w-full max-w-md bg-gray-800 rounded-lg overflow-hidden"></div>
+        <p class="text-white mt-4">Posisikan barcode di dalam kamera</p>
+        <button onclick="closeScanModal()" class="btn bg-red-500 text-white mt-8 px-6 py-3">
+            Tutup
+        </button>
+    </div>
+</div>
+
+<!-- Due Date Details Modal -->
+<div id="dueDateModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-[1500]">
+    <div class="flex items-center justify-center h-full p-4">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold">Detail Jatuh Tempo</h2>
+                <button onclick="closeDueDateModal()" class="text-gray-500 text-2xl">&times;</button>
+            </div>
+            <div id="dueDateList" class="space-y-3">
+                <!-- Due items will be listed here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Camera Modal -->
+<div id="cameraModal" class="fixed inset-0 bg-black bg-opacity-90 hidden z-[1600]">
+    <div class="flex flex-col items-center justify-center h-full p-4 text-white">
+        <video id="cameraFeed" playsinline class="w-full max-w-md rounded-lg mb-4" style="display: none;"></video>
+        <canvas id="cameraCanvas" class="hidden"></canvas>
+        <img id="photoPreview" class="w-full max-w-md rounded-lg mb-4" style="display: none;"/>
+        <div id="cameraError" class="text-red-400 mb-4" style="display: none;"></div>
+        <div id="cameraControls" class="flex items-center gap-4">
+            <button id="cancelCameraBtn" onclick="closeCameraModal()" class="btn bg-gray-500 text-white px-4 py-2">Batal</button>
+            <button id="captureBtn" onclick="capturePhoto()" class="w-16 h-16 rounded-full bg-white border-4 border-gray-400 flex items-center justify-center clickable"></button>
+            <button id="retakeBtn" onclick="retakePhoto()" class="btn bg-yellow-500 text-white px-4 py-2" style="display: none;">Ulangi</button>
+            <button id="usePhotoBtn" onclick="useCapturedPhoto()" class="btn bg-blue-500 text-white px-4 py-2" style="display: none;">Gunakan Foto</button>
+        </div>
+    </div>
+</div>
+
+<!-- Ledger Actions Popover -->
+<div id="ledgerActionsPopover" class="hidden absolute bg-white rounded-lg shadow-xl border z-[1650] text-sm">
+    <!-- Actions will be injected here by JS -->
+</div>
+
+<!-- Print Help Modal (NEW) -->
+<div id="printHelpModal" class="fixed inset-0 bg-black bg-opacity-50 hidden">
+    <div class="flex items-center justify-center h-full p-4">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold">Bantuan Cetak Struk</h2>
+                <button onclick="closePrintHelpModal()" class="text-gray-500 text-2xl">&times;</button>
+            </div>
+            <div class="space-y-4 text-gray-700 text-sm">
+                <p class="pt-2">Jika hasil cetak struk Anda keluar dalam bentuk teks acak atau tidak tercetak sama sekali, ini biasanya karena masalah konfigurasi pada ponsel Anda, bukan pada aplikasi ini.</p>
+                
+                <div class="p-3 bg-gray-50 border rounded-lg">
+                    <h3 class="font-semibold text-md mb-2">Penyebab Umum Kegagalan Cetak:</h3>
+                    <ul class="list-disc list-inside space-y-1">
+                        <li>Aplikasi <strong class="text-blue-600">RawBT</strong> tidak ter-install.</li>
+                        <li>Koneksi printer belum diatur dengan benar di dalam aplikasi RawBT.</li>
+                        <li>Ada aplikasi lain yang mencoba menangani perintah cetak.</li>
+                    </ul>
+                </div>
+                <a href="https://play.google.com/store/apps/details?id=ru.a402d.rawbtprinter" target="_blank" class="btn bg-green-500 text-white w-full py-2 mt-4 block text-center">
+                    <i class="fab fa-google-play mr-2"></i>Download RawBT di Play Store
+                </a>
+            </div>
+            <div class="flex mt-6">
+                <button onclick="closePrintHelpModal()" class="btn bg-gray-300 text-gray-700 flex-1 py-2">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Manage Users Modal (NEW) -->
+<div id="manageUsersModal" class="fixed inset-0 bg-black bg-opacity-50 hidden">
+    <div class="flex items-center justify-center h-full p-4">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold">Kelola Pengguna</h2>
+                <button onclick="showUserFormModal()" class="btn bg-blue-500 text-white px-3 py-1 text-sm"><i class="fas fa-plus"></i> Tambah</button>
+            </div>
+            <div id="usersList" class="space-y-2">
+                <!-- User list will be populated here -->
+            </div>
+            <div class="flex mt-6">
+                <button onclick="closeManageUsersModal()" class="btn bg-gray-300 text-gray-700 flex-1 py-2">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- User Form Modal (NEW) -->
+<div id="userFormModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-[1600]">
+    <div class="flex items-center justify-center h-full p-4">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-sm">
+            <h2 id="userFormTitle" class="text-xl font-bold mb-4">Tambah Pengguna</h2>
+            <input type="hidden" id="userId">
+            <div class="space-y-3">
+                <div>
+                    <label class="text-sm text-gray-600">Nama Pengguna</label>
+                    <input type="text" id="userName" class="input-field w-full">
+                </div>
+                <div>
+                    <label class="text-sm text-gray-600">PIN (4 digit)</label>
+                    <input type="password" inputmode="numeric" id="userPin" class="input-field w-full" placeholder="Kosongkan jika tidak diubah" maxlength="4">
+                </div>
+                <div>
+                    <label class="text-sm text-gray-600">Peran</label>
+                    <select id="userRole" class="input-field w-full">
+                        <option value="cashier">Kasir</option>
+                        <option value="manager">Manajer</option>
+                        <option value="owner">Pemilik</option>
+                    </select>
+                </div>
+            </div>
+             <div class="flex gap-3 mt-6">
+                <button onclick="closeUserFormModal()" class="btn bg-gray-300 text-gray-700 flex-1 py-2">Batal</button>
+                <button onclick="saveUser()" class="btn bg-blue-500 text-white flex-1 py-2">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Import Products Modal -->
+<div id="importProductsModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-[1600]">
+    <div class="flex items-center justify-center h-full p-4">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <h2 class="text-xl font-bold mb-4">Import Produk dari CSV</h2>
+            <p class="text-sm text-gray-600 mb-4">Unggah file CSV untuk menambah atau memperbarui produk secara massal. Jika produk dengan `nama` atau `barcode` yang sama sudah ada, datanya akan diperbarui.</p>
+            
+            <div class="p-3 bg-gray-50 border rounded-lg text-sm text-gray-700 mb-4">
+                <h3 class="font-semibold mb-2">Struktur Kolom yang Diperlukan:</h3>
+                <code class="block bg-gray-200 p-2 rounded text-xs overflow-x-auto">nama,kategori,harga_beli,harga_jual,stok,barcode</code>
+                <ul class="list-disc list-inside mt-2 space-y-1 text-xs">
+                    <li><span class="font-semibold">nama</span>: (Wajib) Nama Produk</li>
+                    <li><span class="font-semibold">kategori</span>: (Opsional) Kategori Produk</li>
+                    <li><span class="font-semibold">harga_beli</span>: (Opsional) Harga Beli, default 0</li>
+                    <li><span class="font-semibold">harga_jual</span>: (Opsional) Harga Jual</li>
+                    <li><span class="font-semibold">stok</span>: (Opsional) Jumlah Stok, default 0</li>
+                    <li><span class="font-semibold">barcode</span>: (Opsional) Kode unik produk</li>
+                </ul>
+            </div>
+            
+            <a href="data:text/csv;charset=utf-8,nama,kategori,harga_beli,harga_jual,stok,barcode%0Akopi%20susu,Minuman,3500,4500,55" download="template_produk.csv" class="btn bg-green-500 text-white w-full py-2 mb-2 block text-center">
+                <i class="fas fa-download mr-2"></i>Unduh Template
+            </a>
+            
+            <button onclick="document.getElementById('importProductsFile').click()" class="btn bg-blue-500 text-white w-full py-2">
+                <i class="fas fa-upload mr-2"></i>Pilih File CSV
+            </button>
+            <input type="file" id="importProductsFile" style="display: none;" accept=".csv,text/csv" onchange="handleProductImport(event)">
+
+            <div class="flex mt-6">
+                 <button onclick="closeImportProductsModal()" class="btn bg-gray-300 text-gray-700 flex-1 py-2">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Cashier Close Report Modal -->
+<div id="cashierReportModal" class="fixed inset-0 bg-black bg-opacity-50 hidden">
+    <div class="flex items-center justify-center h-full p-4">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-sm">
+            <h2 class="text-xl font-bold mb-4">Laporan Tutup Kasir</h2>
+            <div id="cashierReportContent" class="receipt-modal-content text-black font-mono text-sm mb-6 max-h-96 overflow-y-auto">
+                <!-- Report content will be dynamically generated here -->
+            </div>
+            <div class="grid grid-cols-2 gap-2 mb-2">
+                <button onclick="printCashierReport()" class="btn bg-gray-700 hover:bg-gray-800 text-white py-3 text-sm flex items-center justify-center">
+                    <i class="fas fa-print mr-2"></i>Cetak
+                </button>
+                <button onclick="shareCashierReportViaWhatsApp()" class="btn bg-green-500 hover:bg-green-600 text-white py-3 text-sm flex items-center justify-center">
+                    <i class="fas fa-share-alt mr-2"></i>Share
+                </button>
+            </div>
+            <button onclick="closeCashierReportModal()" class="btn bg-blue-500 hover:bg-blue-600 text-white w-full py-3 text-base">Tutup</button>
+        </div>
+    </div>
+</div>
+
+<!-- Firebase Auth Container -->
+<div id="authContainer" class="fixed inset-0 bg-slate-100 z-[9997] hidden">
+    <div class="flex flex-col items-center justify-center h-full p-4">
+        <!-- Persistent Info Message -->
+        <div id="authInfo" class="w-full max-w-sm text-green-700 bg-green-50 border border-green-200 rounded-lg p-3 text-sm text-center hidden mb-4"></div>
+
+        <!-- Login View -->
+        <div id="loginView" class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-lg">
+            <div class="text-center mb-6">
+                <!-- Local logo path -->
+                <img src="/src/lib/logo.png" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/herutama7782/iconomsetpos/refs/heads/main/logo.png'" alt="OmsetPOS Logo" class="app-logo-img w-20 h-20 mx-auto rounded-2xl shadow-lg mb-4">
+                <h1 class="text-2xl font-bold text-gray-800">Selamat Datang Kembali</h1>
+                <p class="text-gray-600 mt-1">Login untuk melanjutkan</p>
+            </div>
+            <form onsubmit="handleEmailLogin(event); return false;" class="space-y-4">
+                <div>
+                    <label for="loginEmail" class="text-sm font-medium text-gray-700">Email</label>
+                    <input type="email" id="loginEmail" required class="input-field w-full mt-1" placeholder="email@anda.com">
+                </div>
+                <div>
+                    <div class="flex justify-between items-center">
+                        <label for="loginPassword" class="text-sm font-medium text-gray-700">Password</label>
+                        <button type="button" onclick="showForgotPasswordView()" class="text-sm text-blue-500 hover:underline">Lupa Password?</button>
+                    </div>
+                    <div class="relative mt-1">
+                        <input type="password" id="loginPassword" required class="input-field w-full pr-10" placeholder="********">
+                        <button type="button" onclick="togglePasswordVisibility('loginPassword', 'loginPasswordIcon')" class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500 hover:text-gray-700 focus:outline-none">
+                            <i id="loginPasswordIcon" class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="loginError" class="text-red-500 text-sm text-center min-h-[1.25rem]"></div>
+                <button type="submit" id="loginButton" class="btn bg-blue-500 text-white w-full py-3 font-semibold flex items-center justify-center">
+                    <span class="auth-button-text">Login</span>
+                    <i class="fas fa-spinner fa-spin auth-button-spinner"></i>
+                </button>
+                
+                <div class="relative my-4">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-gray-300"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm">
+                        <span class="px-2 bg-white text-gray-500">Atau</span>
+                    </div>
+                </div>
+
+                <button type="button" onclick="handleGoogleLogin()" class="btn bg-white border border-gray-300 text-gray-700 w-full py-3 font-semibold flex items-center justify-center hover:bg-gray-50 transition-colors">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5 mr-3" alt="Google">
+                    Masuk dengan Google
+                </button>
+
+                <p class="text-center text-sm text-gray-600 pt-2">
+                    Belum punya akun? 
+                    <button type="button" onclick="showRegisterView()" class="font-semibold text-blue-500 hover:underline">Daftar disini</button>
+                </p>
+            </form>
+        </div>
+
+        <!-- Register View -->
+        <div id="registerView" class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-lg hidden">
+            <div class="text-center mb-6">
+                <!-- Local logo path -->
+                <img src="/src/lib/logo.png" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/herutama7782/iconomsetpos/refs/heads/main/logo.png'" alt="OmsetPOS Logo" class="app-logo-img w-20 h-20 mx-auto rounded-2xl shadow-lg mb-4">
+                <h1 class="text-2xl font-bold text-gray-800">Buat Akun Baru</h1>
+                <p class="text-gray-600 mt-1">Daftar untuk memulai</p>
+            </div>
+            <form id="registerForm" onsubmit="handleEmailRegister(event); return false;" class="space-y-4">
+                <div>
+                    <label for="registerEmail" class="text-sm font-medium text-gray-700">Email</label>
+                    <input type="email" id="registerEmail" required class="input-field w-full mt-1" placeholder="email@anda.com">
+                </div>
+                <div>
+                    <label for="registerPassword" class="text-sm font-medium text-gray-700">Password</label>
+                    <div class="relative mt-1">
+                        <input type="password" id="registerPassword" required class="input-field w-full pr-10" placeholder="Minimal 6 karakter">
+                        <button type="button" onclick="togglePasswordVisibility('registerPassword', 'registerPasswordIcon')" class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500 hover:text-gray-700 focus:outline-none">
+                            <i id="registerPasswordIcon" class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    <label for="registerConfirmPassword" class="text-sm font-medium text-gray-700">Konfirmasi Password</label>
+                    <div class="relative mt-1">
+                        <input type="password" id="registerConfirmPassword" required class="input-field w-full pr-10" placeholder="Ulangi password">
+                        <button type="button" onclick="togglePasswordVisibility('registerConfirmPassword', 'registerConfirmPasswordIcon')" class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500 hover:text-gray-700 focus:outline-none">
+                            <i id="registerConfirmPasswordIcon" class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="flex items-start">
+                    <div class="flex items-center h-5">
+                      <input id="termsCheckbox" type="checkbox" value="" required class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2">
+                    </div>
+                    <label for="termsCheckbox" class="ml-2 text-sm text-gray-600">Dengan ini, saya membaca, memahami, dan menyetujui pendaftaran pada aplikasi.</label>
+                </div>
+                <div id="registerError" class="text-red-500 text-sm text-center min-h-[1.25rem]"></div>
+                <button type="submit" id="registerButton" class="btn bg-blue-500 text-white w-full py-3 font-semibold flex items-center justify-center">
+                    <span class="auth-button-text">Daftar</span>
+                    <i class="fas fa-spinner fa-spin auth-button-spinner"></i>
+                </button>
+            </form>
+            <p id="loginLink" class="text-center text-sm text-gray-600 mt-4">
+                Sudah punya akun? <button onclick="showLoginView()" class="font-semibold text-blue-500">Login disini</button>
+            </p>
+        </div>
+
+        <!-- Forgot Password View -->
+        <div id="forgotPasswordView" class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-lg hidden">
+            <div class="text-center mb-6">
+                <!-- Local logo path -->
+                <img src="/src/lib/logo.png" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/herutama7782/iconomsetpos/refs/heads/main/logo.png'" alt="OmsetPOS Logo" class="app-logo-img w-20 h-20 mx-auto rounded-2xl shadow-lg mb-4">
+                <h1 class="text-2xl font-bold text-gray-800">Reset Password</h1>
+                <p class="text-gray-600 mt-1">Masukkan email Anda</p>
+            </div>
+            <form onsubmit="handleForgotPassword(event); return false;" class="space-y-4">
+                <div>
+                    <label for="forgotEmail" class="text-sm font-medium text-gray-700">Email</label>
+                    <input type="email" id="forgotEmail" required class="input-field w-full mt-1" placeholder="email@anda.com">
+                </div>
+                <div id="forgotError" class="text-red-500 text-sm text-center min-h-[1.25rem]"></div>
+                <div id="forgotSuccess" class="text-green-600 text-sm text-center min-h-[1.25rem]"></div>
+                <button type="submit" id="forgotButton" class="btn bg-blue-500 text-white w-full py-3 font-semibold flex items-center justify-center">
+                    <span class="auth-button-text">Kirim Link Reset</span>
+                    <i class="fas fa-spinner fa-spin auth-button-spinner"></i>
+                </button>
+            </form>
+            <p class="text-center text-sm text-gray-600 mt-4">
+                Ingat password Anda? <button onclick="showLoginView()" class="font-semibold text-blue-500">Kembali ke Login</button>
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- PIN Login Modal -->
+<div id="loginModal" class="fixed inset-0 bg-slate-100 z-[9998] hidden">
+    <div class="flex flex-col items-center justify-center h-full p-4">
+        <!-- Local logo path -->
+        <img src="/src/lib/logo.png" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/herutama7782/iconomsetpos/refs/heads/main/logo.png'" alt="OmsetPOS Logo" class="app-logo-img w-20 h-20 mx-auto rounded-2xl shadow-lg mb-4">
+        <h2 class="text-2xl font-bold text-gray-800 mb-2">Masukkan PIN Anda</h2>
+        <div id="pinDisplay" class="flex gap-4 mb-6 h-8 items-center">
+            <!-- PIN dots will be generated here -->
+        </div>
+        <div id="pinLockoutMessage" class="text-center text-red-500 font-semibold mb-4 hidden h-5"></div>
+        <div id="pinKeypad" class="grid grid-cols-3 gap-4 w-full max-w-xs">
+            <button onclick="handlePinInput('1')" class="btn bg-white text-3xl font-bold p-4 h-20 rounded-2xl shadow-md">1</button>
+            <button onclick="handlePinInput('2')" class="btn bg-white text-3xl font-bold p-4 h-20 rounded-2xl shadow-md">2</button>
+            <button onclick="handlePinInput('3')" class="btn bg-white text-3xl font-bold p-4 h-20 rounded-2xl shadow-md">3</button>
+            <button onclick="handlePinInput('4')" class="btn bg-white text-3xl font-bold p-4 h-20 rounded-2xl shadow-md">4</button>
+            <button onclick="handlePinInput('5')" class="btn bg-white text-3xl font-bold p-4 h-20 rounded-2xl shadow-md">5</button>
+            <button onclick="handlePinInput('6')" class="btn bg-white text-3xl font-bold p-4 h-20 rounded-2xl shadow-md">6</button>
+            <button onclick="handlePinInput('7')" class="btn bg-white text-3xl font-bold p-4 h-20 rounded-2xl shadow-md">7</button>
+            <button onclick="handlePinInput('8')" class="btn bg-white text-3xl font-bold p-4 h-20 rounded-2xl shadow-md">8</button>
+            <button onclick="handlePinInput('9')" class="btn bg-white text-3xl font-bold p-4 h-20 rounded-2xl shadow-md">9</button>
+            <button onclick="handlePinInput('clear')" class="btn bg-white text-xl font-bold p-4 h-20 rounded-2xl shadow-md text-orange-500">C</button>
+            <button onclick="handlePinInput('0')" class="btn bg-white text-3xl font-bold p-4 h-20 rounded-2xl shadow-md">0</button>
+            <button onclick="handlePinInput('backspace')" class="btn bg-white text-2xl font-bold p-4 h-20 rounded-2xl shadow-md"><i class="fas fa-backspace"></i></button>
+        </div>
+    </div>
+</div>
+
+<!-- Set Initial PIN Modal -->
+<div id="setDevicePinModal" class="fixed inset-0 bg-slate-100 z-[9998] hidden">
+    <div class="flex items-center justify-center h-full p-4">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-sm shadow-lg">
+            <h2 class="text-xl font-bold mb-2 text-center">Buat PIN Keamanan</h2>
+            <p class="text-gray-600 mb-4 text-sm text-center">Anda adalah pengguna pertama. Buat PIN 4 digit untuk akun <strong>Pemilik</strong> Anda.</p>
+            <!-- Local logo path -->
+            <img src="/src/lib/logo.png" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/herutama7782/iconomsetpos/refs/heads/main/logo.png'" alt="OmsetPOS Logo" class="app-logo-img w-16 h-16 mx-auto rounded-xl shadow-md mb-4">
+            <div class="space-y-3">
+                <input type="password" inputmode="numeric" id="setPinInput" class="input-field w-full text-center text-2xl tracking-[1em]" maxlength="4" placeholder="••••" autocomplete="new-password">
+                <input type="password" inputmode="numeric" id="confirmPinInput" class="input-field w-full text-center text-2xl tracking-[1em]" maxlength="4" placeholder="••••" autocomplete="new-password">
+            </div>
+            <div id="pinSetError" class="text-red-500 text-sm text-center min-h-[1.25rem] mt-2"></div>
+            <div class="flex mt-4">
+                <button onclick="handleInitialPinSetup()" class="btn bg-blue-500 text-white flex-1 py-3 font-semibold">Simpan PIN</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Variation Selection Modal -->
+<div id="variationSelectionModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-[1550]">
+    <div class="flex items-center justify-center h-full p-4">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-sm">
+            <div class="flex justify-between items-center mb-4">
+                <h2 id="variationModalTitle" class="text-xl font-bold">Pilih Variasi</h2>
+                <button onclick="closeVariationSelectionModal()" class="text-gray-500 text-2xl">&times;</button>
+            </div>
+            <div id="variationList" class="space-y-2 max-h-60 overflow-y-auto">
+                <!-- Variation options will be populated here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Pending Transactions Modal -->
+<div id="pendingTransactionsModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-[1500]">
+    <div class="flex items-center justify-center h-full p-4">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold">Transaksi Tertahan</h2>
+                <button onclick="closePendingTransactionsModal()" class="text-gray-500 text-2xl">&times;</button>
+            </div>
+            <div id="pendingTransactionsList" class="space-y-3">
+                <!-- List will be populated here -->
+            </div>
+        </div>
+    </div>
+</div>

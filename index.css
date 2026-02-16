@@ -1,0 +1,1052 @@
+
+
+/* Android UI Styles */
+* {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background-color: #f5f5f5;
+    overflow-x: hidden;
+    touch-action: manipulation;
+    padding-top: 0;
+    position: relative; /* Container for absolute positioned pages */
+    min-height: 100vh;
+}
+
+/* Bottom Navigation */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    z-index: 1000;
+    pointer-events: auto;
+}
+
+.nav-item {
+    transition: all 0.3s ease;
+    cursor: pointer;
+    -webkit-tap-highlight-color: rgba(59, 130, 246, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-item::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(59, 130, 246, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.3s, height 0.3s;
+}
+
+.nav-item:active::before {
+    width: 100px;
+    height: 100px;
+}
+
+.nav-item.active {
+    color: #3b82f6;
+}
+
+.nav-item.active .nav-icon {
+    transform: scale(1.1);
+}
+
+/* Hide Kasir from bottom navigation but keep functionality */
+.nav-item[data-page="kasir"] {
+    display: none;
+}
+
+/* Navigation Icon Animation */
+.nav-icon {
+    transition: all 0.3s ease;
+    display: block;
+}
+
+.nav-text {
+    transition: all 0.3s ease;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+/* Card Styles */
+.card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+}
+
+.card:active {
+    transform: scale(0.98);
+}
+
+/* Button Styles */
+.btn {
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    cursor: pointer;
+    -webkit-tap-highlight-color: rgba(59, 130, 246, 0.3);
+}
+
+.btn:active {
+    transform: scale(0.95);
+}
+
+/* Cashier Button Styles */
+.cashier-btn {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: rgba(255, 255, 255, 0.3);
+}
+
+.cashier-btn:active {
+    transform: scale(0.98);
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+.cashier-btn-content {
+    display: flex;
+    align-items: center;
+}
+
+.cashier-btn-icon {
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 16px;
+}
+
+.cashier-btn-text h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.cashier-btn-text p {
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+.cashier-btn-arrow {
+    font-size: 24px;
+    opacity: 0.8;
+}
+
+/* Input Styles */
+.input-field {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.input-field:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Product Grid */
+.product-item {
+    background: white;
+    border-radius: 12px;
+    padding: 12px;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 1px solid transparent;
+    -webkit-tap-highlight-color: rgba(59, 130, 246, 0.3);
+}
+
+.product-item:active {
+    transform: scale(0.95);
+    background: #f3f4f6;
+}
+
+.product-image {
+    width: 100%;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 8px;
+}
+
+/* Cart Item */
+.cart-item {
+    background: white;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 8px;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* --- New Stair Loader --- */
+.loader {
+    position: relative;
+    width: 75px;
+    height: 100px;
+}
+
+.loader__bar {
+    position: absolute;
+    bottom: 0;
+    width: 10px;
+    height: 50%;
+    background: #3b82f6;
+    transform-origin: center bottom;
+    box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2);
+}
+
+.loader__bar:nth-child(1) {
+    left: 0px;
+    transform: scale(1, 0.2);
+    animation: barUp1 4s infinite;
+}
+
+.loader__bar:nth-child(2) {
+    left: 15px;
+    transform: scale(1, 0.4);
+    animation: barUp2 4s infinite;
+}
+
+.loader__bar:nth-child(3) {
+    left: 30px;
+    transform: scale(1, 0.6);
+    animation: barUp3 4s infinite;
+}
+
+.loader__bar:nth-child(4) {
+    left: 45px;
+    transform: scale(1, 0.8);
+    animation: barUp4 4s infinite;
+}
+
+.loader__bar:nth-child(5) {
+    left: 60px;
+    transform: scale(1, 1);
+    animation: barUp5 4s infinite;
+}
+
+.loader__ball {
+    position: absolute;
+    bottom: 10px;
+    left: 0;
+    width: 10px;
+    height: 10px;
+    background: #3b82f6;
+    border-radius: 50%;
+    animation: ball 4s infinite;
+}
+
+@keyframes ball {
+    0% {
+        transform: translate(0, 0);
+    }
+    5% {
+        transform: translate(8px, -14px);
+    }
+    10% {
+        transform: translate(15px, -10px);
+    }
+    17% {
+        transform: translate(23px, -24px);
+    }
+    20% {
+        transform: translate(30px, -20px);
+    }
+    27% {
+        transform: translate(38px, -34px);
+    }
+    30% {
+        transform: translate(45px, -30px);
+    }
+    37% {
+        transform: translate(53px, -44px);
+    }
+    40% {
+        transform: translate(60px, -40px);
+    }
+    50% {
+        transform: translate(60px, 0);
+    }
+    57% {
+        transform: translate(53px, -14px);
+    }
+    60% {
+        transform: translate(45px, -10px);
+    }
+    67% {
+        transform: translate(37px, -24px);
+    }
+    70% {
+        transform: translate(30px, -20px);
+    }
+    77% {
+        transform: translate(22px, -34px);
+    }
+    80% {
+        transform: translate(15px, -30px);
+    }
+    87% {
+        transform: translate(7px, -44px);
+    }
+    90% {
+        transform: translate(0, -40px);
+    }
+    100% {
+        transform: translate(0, 0);
+    }
+}
+
+@keyframes barUp1 {
+    0% {
+        transform: scale(1, 0.2);
+    }
+    40% {
+        transform: scale(1, 0.2);
+    }
+    50% {
+        transform: scale(1, 1);
+    }
+    90% {
+        transform: scale(1, 1);
+    }
+    100% {
+        transform: scale(1, 0.2);
+    }
+}
+
+@keyframes barUp2 {
+    0% {
+        transform: scale(1, 0.4);
+    }
+    40% {
+        transform: scale(1, 0.4);
+    }
+    50% {
+        transform: scale(1, 0.8);
+    }
+    90% {
+        transform: scale(1, 0.8);
+    }
+    100% {
+        transform: scale(1, 0.4);
+    }
+}
+
+@keyframes barUp3 {
+    0% {
+        transform: scale(1, 0.6);
+    }
+    100% {
+        transform: scale(1, 0.6);
+    }
+}
+
+@keyframes barUp4 {
+    0% {
+        transform: scale(1, 0.8);
+    }
+    40% {
+        transform: scale(1, 0.8);
+    }
+    50% {
+        transform: scale(1, 0.4);
+    }
+    90% {
+        transform: scale(1, 0.4);
+    }
+    100% {
+        transform: scale(1, 0.8);
+    }
+}
+
+@keyframes barUp5 {
+    0% {
+        transform: scale(1, 1);
+    }
+    40% {
+        transform: scale(1, 1);
+    }
+    50% {
+        transform: scale(1, 0.2);
+    }
+    90% {
+        transform: scale(1, 0.2);
+    }
+    100% {
+        transform: scale(1, 1);
+    }
+}
+/* --- End of New Loader --- */
+
+
+/* Page Container */
+.page {
+    display: none;
+    padding-bottom: 80px;
+    min-height: 100vh;
+
+    /* For transitions */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #f5f5f5; /* Match body background to prevent seeing through */
+    transition: transform 300ms ease-in-out, opacity 300ms ease-in-out;
+}
+
+.page.active {
+    display: block;
+}
+
+/* New animation classes */
+.page-exit {
+  transform: translateX(-20px);
+  opacity: 0;
+}
+
+.page-enter {
+  transform: translateX(20px);
+  opacity: 0;
+}
+
+
+/* Toast Notification */
+.toast {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: #1f2937;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 2000;
+    pointer-events: none;
+}
+
+.toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+
+/* Image Upload Styles */
+.image-upload-container {
+    position: relative;
+    width: 100%;
+    height: 150px;
+    border: 2px dashed #e5e7eb;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    -webkit-tap-highlight-color: rgba(59, 130, 246, 0.3);
+}
+
+.image-upload-container:hover {
+    border-color: #3b82f6;
+    background: #f8fafc;
+}
+
+.image-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.upload-placeholder {
+    text-align: center;
+    color: #6b7280;
+}
+
+.product-list-image {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+/* Profit Badge */
+.profit-badge {
+    background: #10b981;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+/* Low Stock Badge */
+.low-stock-badge {
+    background: #f59e0b;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+/* Empty State Styles */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #6b7280;
+}
+
+.empty-state-icon {
+    font-size: 48px;
+    color: #d1d5db;
+    margin-bottom: 16px;
+}
+
+.empty-state-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #374151;
+}
+
+.empty-state-description {
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.empty-state-action {
+    display: inline-block;
+    background: #3b82f6;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background 0.3s ease;
+    cursor: pointer;
+    -webkit-tap-highlight-color: rgba(255, 255, 255, 0.3);
+}
+
+.empty-state-action:active {
+    background: #2563eb;
+}
+
+/* Clickable elements */
+.clickable {
+    cursor: pointer;
+    -webkit-tap-highlight-color: rgba(59, 130, 246, 0.3);
+}
+
+/* Fix for iOS Safari */
+@supports (-webkit-touch-callout: none) {
+    .nav-item, .btn, .product-item, .cashier-btn, .image-upload-container, .empty-state-action {
+        -webkit-tap-highlight-color: transparent;
+    }
+}
+
+/* Fullscreen mode for mobile */
+@media screen and (display-mode: fullscreen) {
+    body {
+        padding-top: env(safe-area-inset-top);
+    }
+}
+
+/* Low Stock Warning */
+.low-stock-warning {
+    background-color: #fffbeb; /* Tailwind amber-50 */
+    border: 1px solid #fcd34d; /* Tailwind amber-300 */
+}
+
+/* Receipt Modal Styles */
+.receipt-modal-content {
+    font-family: 'Courier New', Courier, monospace;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+.receipt-divider {
+    letter-spacing: -1px;
+    overflow: hidden;
+    text-align: center;
+}
+
+/* Print Styles */
+@media print {
+    body * {
+        visibility: hidden;
+    }
+
+    #receiptContent, #receiptContent * {
+        visibility: visible;
+    }
+
+    #receiptContent {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        padding: 0;
+        margin: 0;
+        color: #000;
+    }
+    
+    .receipt-header h2 {
+        font-size: 12pt;
+    }
+    
+    #receiptLogoContainer {
+        display: block !important;
+    }
+}
+
+/* Modal Z-index Fix */
+#addProductModal,
+#editProductModal,
+#manageCategoryModal,
+#paymentModal,
+#receiptModal,
+#previewReceiptModal,
+#scanModal,
+#feeSelectionModal,
+#printHelpModal,
+#dueDateModal,
+#contactModal,
+#ledgerModal,
+#manageUsersModal,
+#cashierReportModal {
+    z-index: 1500;
+}
+
+#confirmationModal {
+    z-index: 3000;
+}
+
+/* Shake animation for incorrect PIN */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+.animate-shake {
+    animation: shake 0.5s ease-in-out;
+}
+
+/* Cart FAB Styles */
+.cart-fab {
+    position: fixed;
+    bottom: 90px; /* Above nav bar */
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+    z-index: 1001; /* Above content, below modals */
+    transition: all 0.3s ease;
+}
+
+/* Dashboard Logo Styles */
+#dashboardLogo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 10px;
+}
+
+#dashboardLogoImg {
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.cart-fab:active {
+    transform: scale(0.95);
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+}
+
+.cart-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: #ef4444; /* red-500 */
+    color: white;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    font-size: 12px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+}
+
+/* Cart Modal/Sheet Animation */
+#cartSection.show {
+    transform: translateY(0);
+}
+
+/* Styling for Kontak page tabs */
+.tab-item {
+    flex-grow: 1;
+    padding: 12px;
+    cursor: pointer;
+    text-align: center;
+    font-weight: 500;
+    color: #6b7280; /* text-gray-500 */
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s ease-in-out;
+}
+
+.tab-item:hover {
+    color: #1f2937; /* text-gray-800 */
+}
+
+.tab-item.active {
+    color: #3b82f6; /* text-blue-500 */
+    font-weight: 600;
+    border-bottom-color: #3b82f6; /* border-blue-500 */
+}
+
+/* Ledger Actions Popover */
+#ledgerActionsPopover a {
+    display: block;
+    padding: 8px 16px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 0.2s ease;
+}
+
+#ledgerActionsPopover a:hover {
+    background-color: #f3f4f6; /* gray-100 */
+}
+
+#ledgerActionsPopover a:not(:last-child) {
+    border-bottom: 1px solid #e5e7eb; /* gray-200 */
+}
+
+#ledgerActionsPopover a.text-red-600:hover {
+    background-color: #fee2e2; /* red-100 */
+}
+
+/* Auth button spinner */
+.btn .auth-button-spinner {
+    display: none;
+}
+
+.btn:disabled .auth-button-spinner {
+    display: inline-block;
+}
+
+.btn:disabled .auth-button-text {
+    display: none;
+}
+
+/* ================================
+   Neumorphism Style mirip desain contoh
+   Tempel di PALING BAWAH file CSS
+   ================================ */
+
+:root {
+    /* Warna dasar */
+    --neu-bg: #edf2ff;          /* latar belakang layar (biru sangat muda) */
+    --neu-surface: #ffffff;     /* warna kartu / tombol */
+    --neu-shadow-light: rgba(255, 255, 255, 0.9);   /* sebelumnya 0.95 */
+    --neu-shadow-dark: rgba(163, 177, 198, 0.35);   /* sebelumnya 0.45 */
+
+    --primary: #5663ff;         /* biru utama (ikon & teks aktif) */
+    --text-main: #1f2937;
+    --text-soft: #9ca3af;
+}
+
+/* ========== Background dasar ========== */
+
+body {
+    /* gradient lembut seperti contoh */
+    background:
+        radial-gradient(circle at 0% 0%, #ffffff 0, #f7f8ff 35%, #e2e8ff 100%);
+    color: var(--text-main);
+    font-smooth: antialiased;
+}
+
+.page {
+    background: transparent;  /* biar ikut gradient body */
+}
+
+/* ========= Bottom Navigation ========= */
+
+.bottom-nav {
+    background: var(--neu-surface);
+    border-radius: 26px 26px 0 0;
+    box-shadow:
+        0 -6px 20px rgba(163, 177, 198, 0.25);
+    padding-inline: 10px;
+}
+
+/* Item nav = kapsul lembut */
+.nav-item {
+    border-radius: 9999px;
+    margin: 6px 6px 10px;
+    padding: 8px 12px;
+    background: var(--neu-surface);
+    color: var(--text-soft);
+    box-shadow:
+        8px 8px 18px var(--neu-shadow-dark),
+       -8px -8px 18px var(--neu-shadow-light);
+    overflow: hidden;
+    transition: color .2s ease, box-shadow .15s ease, transform .1s ease;
+}
+
+/* Matikan ripple lama */
+.nav-item::before {
+    display: none;
+}
+
+/* State aktif = sedikit masuk + biru */
+.nav-item.active {
+    color: var(--primary);
+    background: var(--neu-surface);
+    box-shadow:
+        inset 4px 4px 10px rgba(163, 177, 198, 0.35),
+        inset -4px -4px 10px rgba(255, 255, 255, 0.75);
+}
+
+.nav-item:active:not(.active) {
+    transform: translateY(1px);
+    box-shadow:
+        4px 4px 10px rgba(163, 177, 198, 0.3),
+       -4px -4px 10px rgba(255, 255, 255, 0.75);
+}
+
+.nav-item .nav-icon {
+    font-size: 1.2rem;
+}
+
+.nav-item.active .nav-icon {
+    transform: scale(1.06);
+}
+
+/* ========= Card / Kontainer ========= */
+
+.card,
+.cart-item {
+    background: var(--neu-surface);
+    border-radius: 22px;
+    border: none;
+    box-shadow:
+        10px 10px 24px rgba(163, 177, 198, 0.32),
+       -10px -10px 24px rgba(255, 255, 255, 0.85);
+    transition: box-shadow 0.2s ease, transform 0.1s ease;
+}
+
+.card:active,
+.cart-item:active {
+    box-shadow:
+        inset 5px 5px 12px rgba(163, 177, 198, 0.35),
+        inset -5px -5px 12px rgba(255, 255, 255, 0.8);
+    transform: translateY(2px);
+}
+
+/* ========= Tombol Umum ========= */
+
+.btn {
+    border-radius: 9999px;
+    border: none;
+    background: var(--neu-surface);
+    color: var(--primary);
+    box-shadow:
+        8px 8px 18px rgba(163, 177, 198, 0.35),
+       -8px -8px 18px rgba(255, 255, 255, 0.85);
+    background-clip: padding-box;
+    transition: box-shadow 0.15s ease, transform 0.1s ease;
+}
+
+.btn:active {
+    box-shadow:
+        inset 4px 4px 10px rgba(163, 177, 198, 0.35),
+        inset -4px -4px 10px rgba(255, 255, 255, 0.8);
+    transform: translateY(1px);
+}
+
+/* ========= Tombol Kasir (hero button) ========= */
+
+.cashier-btn {
+    background: linear-gradient(135deg, #647bff, #4454ff);
+    color: #ffffff;
+    border-radius: 24px;
+    box-shadow:
+        12px 12px 24px rgba(86, 99, 255, 0.32),
+       -10px -10px 24px rgba(255, 255, 255, 0.7);
+}
+
+.cashier-btn:active {
+    box-shadow:
+        inset 4px 4px 12px rgba(36, 49, 185, 0.5),
+        inset -4px -4px 12px rgba(255, 255, 255, 0.8);
+    transform: translateY(1px);
+}
+
+.cashier-btn-icon {
+    background: rgba(255, 255, 255, 0.18);
+    border-radius: 9999px;
+    box-shadow:
+        3px 3px 8px rgba(0, 0, 0, 0.15),
+       -3px -3px 8px rgba(255, 255, 255, 0.6);
+}
+
+/* ========= Input Field ========= */
+
+.input-field {
+    background: var(--neu-bg);
+    border: none;
+    border-radius: 16px;
+    padding-inline: 14px;
+}
+
+.input-field:focus {
+    outline: none;
+}
+
+/* ========= Product Item Grid ========= */
+
+.product-item {
+    background: var(--neu-surface);
+    border-radius: 22px;
+    border: none;
+    box-shadow:
+        8px 8px 20px rgba(163, 177, 198, 0.32),
+       -8px -8px 20px rgba(255, 255, 255, 0.86);
+    transition: box-shadow 0.15s ease, transform 0.1s ease;
+}
+
+.product-item:active {
+    box-shadow:
+        inset 4px 4px 10px rgba(163, 177, 198, 0.35),
+        inset -4px -4px 10px rgba(255, 255, 255, 0.8);
+    transform: translateY(2px);
+}
+
+/* ========= Floating Cart FAB ========= */
+
+.cart-fab {
+    background: var(--neu-surface);
+    color: var(--primary);
+    box-shadow:
+        9px 9px 20px rgba(163, 177, 198, 0.4),
+       -8px -8px 20px rgba(255, 255, 255, 0.85);
+    border-radius: 50%;
+}
+
+.cart-fab:active {
+    box-shadow:
+        inset 4px 4px 10px rgba(163, 177, 198, 0.4),
+        inset -4px -4px 10px rgba(255, 255, 255, 0.82);
+    transform: translateY(2px);
+}
+
+/* ========= Upload Gambar ========= */
+
+.image-upload-container {
+    background: var(--neu-surface);
+    border: none;
+    border-radius: 22px;
+    box-shadow:
+        8px 8px 20px rgba(163, 177, 198, 0.32),
+       -8px -8px 20px rgba(255, 255, 255, 0.86);
+}
+
+/* ========= Empty State Action Button ========= */
+
+.empty-state-action {
+    background: var(--neu-surface);
+    color: var(--primary);
+    border-radius: 9999px;
+    box-shadow:
+        8px 8px 18px rgba(163, 177, 198, 0.35),
+       -8px -8px 18px rgba(255, 255, 255, 0.85);
+}
+
+.empty-state-action:active {
+    box-shadow:
+        inset 4px 4px 10px rgba(163, 177, 198, 0.35),
+        inset -4px -4px 10px rgba(255, 255, 255, 0.8);
+}
+
+/* ========= Tab Kontak ========= */
+
+.tab-item {
+    border-bottom: none;
+    border-radius: 9999px;
+    background: transparent;
+    box-shadow: none;
+    margin: 0 4px;
+    color: var(--text-soft);
+}
+
+.tab-item.active {
+    background: var(--neu-surface);
+    color: var(--primary);
+    box-shadow:
+        4px 4px 10px rgba(163, 177, 198, 0.3),
+       -4px -4px 10px rgba(255, 255, 255, 0.88);
+    border-bottom-color: transparent;
+}
+
+/* ========= Logo Dashboard ========= */
+
+#dashboardLogoImg {
+    border-radius: 16px;
+    box-shadow:
+        6px 6px 18px rgba(163, 177, 198, 0.35),
+       -6px -6px 18px rgba(255, 255, 255, 0.86);
+}
