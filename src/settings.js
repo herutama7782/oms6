@@ -1366,8 +1366,24 @@ export async function handleGoogleLogin() {
     } catch (error) {
         console.error("Google login error:", error);
         let msg = "Gagal login dengan Google.";
-        if (error.code === 'auth/popup-closed-by-user') msg = "Login dibatalkan.";
-        else if (error.code === 'auth/network-request-failed') msg = "Koneksi bermasalah.";
+        
+        if (error.code === 'auth/popup-closed-by-user') {
+            msg = "Login dibatalkan oleh pengguna.";
+        } else if (error.code === 'auth/network-request-failed') {
+            msg = "Masalah koneksi internet.";
+        } else if (error.code === 'auth/operation-not-supported-in-this-environment') {
+            msg = "Login Google tidak didukung di lingkungan ini (perlu HTTP/HTTPS).";
+        } else if (error.code === 'auth/popup-blocked') {
+            msg = "Popup login diblokir. Mengalihkan ke mode redirect...";
+            try {
+                 await firebase.auth().signInWithRedirect(provider);
+                 return; // Redirecting, no need to show error
+            } catch (redirError) {
+                 console.error("Redirect login error:", redirError);
+                 msg = "Gagal login (Redirect).";
+            }
+        }
+        
         showLoginView(msg, null, 'error');
     }
 }
@@ -1569,4 +1585,3 @@ export function extendProAccess() {
         'bg-purple-600'
     );
 }
-
